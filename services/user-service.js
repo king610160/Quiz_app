@@ -13,7 +13,7 @@ const userService = {
             email,
             password: hashPassword
         })
-
+        
         if (!user) return cb(new Error('Can not be created!'))
 
         return cb(null, { data: user.toJSON() })
