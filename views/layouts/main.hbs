@@ -9,62 +9,27 @@
           rel="stylesheet" 
           integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" 
           crossorigin="anonymous">
+
     {{!-- Icon website --}}
     <link rel='stylesheet' 
           href='https://cdn-uicons.flaticon.com/2.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+
     {{!-- Custom css --}}
     <link rel="stylesheet" href="/style.css">
+
 </head>
-<body>
+<body class="d-flex flex-column h-100">
     {{!-- nav bars --}}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid justify-content-between">
-            {{!-- left --}}
-            <div class="d-flex">
-                <a class="navbar-brand mx-2" href="/">
-                    <i class="fi fi-rr-home"></i>
-                </a>
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item mx-3 left-nav">
-                        <a class="nav-link" href="#">Plan</a>
-                    </li>
-                    <li class="nav-item mx-3 left-nav">
-                        <a class="nav-link" href="#">Test</a>
-                    </li>
-                </ul>
-            </div>
-
-            {{!-- middle --}}
-            <div class="d-flex navbar-mid">
-                <form class="d-flex">
-                    <input class="form-control me-2 search" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-            </div>
-
-            {{!-- right --}}
-            <div class="d-flex">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/users/login">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/users/register">Register</a>
-                    </li>
-                    {{!-- Here will be user headshot --}}
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/">
-                            <i class="fi fi-rr-home"></i>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-        </div>
-    </nav>
+    {{> header}}
 
     {{!-- body, main board --}}
-    {{{ body }}}
+    <main class="flex-shrink-0 mb-auto" role="main">
+        {{{ body }}}
+    </main>
+    {{!-- footer --}}
+    {{> footer }}
+
+
     {{!-- Bootstrap --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" 
             integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" 
