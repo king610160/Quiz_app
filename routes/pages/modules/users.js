@@ -10,6 +10,6 @@ router.post('/login', passport.authenticate('local', { failureRedirect:'/users/l
 router.get('/register', userController.registerPage)
 router.post('/register', userController.register)
 
-router.get('/logout', userController.logOut)
+router.get('/logout', userController.logout)
 
 module.exports = router

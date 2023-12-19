@@ -10,7 +10,6 @@ const flash = require('connect-flash')
 const passport = require('./config/passport')
 const session = require('express-session')
 const { getUser } = require('./helper/auth-helper')
-// const {} = require('./middleware/auth')
 
 const { pages, apis } = require('./routes')
 
@@ -49,9 +48,6 @@ app.use((req, res, next) => {
     res.locals.user = getUser(req)
     next()
 })
-
-// set error-handle middleware
-// app.use(errorHandlerMiddleware)
 
 app.use('/apis/v1', apis)
 app.use(pages)

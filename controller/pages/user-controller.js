@@ -2,11 +2,7 @@ const userService = require('../../services/user-service')
 
 const userController = {
     loginPage: (req, res) => {
-        // const data = req.session.flash
-        const qq = req.flash('error_msg')
-        const data = {
-            error_msg : qq
-        }
+        const data = req.session.flash
         res.render('users/login', data)
     },
     login: async (req, res) => {
@@ -25,10 +21,12 @@ const userController = {
             res.redirect('/users/login')
         })
     },
-    logOut: (req, res) => {
-        req.flash('success_messages', '登出成功！')
-        req.logout()
-        res.redirect('/users/login')
+    logout: (req, res, next) => {
+        req.flash('success_msg', '登出成功！')
+        req.logout(function(err) {
+            if (err) { return next(err) }
+            res.redirect('/users/login')
+        })
     },
 }
 
