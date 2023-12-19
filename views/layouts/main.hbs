@@ -18,17 +18,18 @@
     <link rel="stylesheet" href="/style.css">
 
 </head>
-<body class="d-flex flex-column h-100">
+{{!-- set body for min view-height 100% --}}
+<body class="d-flex flex-column min-vh-100">
     {{!-- nav bars --}}
     {{> header}}
 
     {{!-- body, main board --}}
-    <main class="flex-shrink-0 mb-auto" role="main">
+    <main class="mb-auto" role="main">
         {{{ body }}}
     </main>
+
     {{!-- footer --}}
     {{> footer }}
-
 
     {{!-- Bootstrap --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" 

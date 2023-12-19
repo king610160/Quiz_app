@@ -44,5 +44,3 @@ app.use(pages)
 app.listen(port, () => {
     console.log(`App is now listening on port ${port}`)
 })
-
-// module.exports = sequelize
