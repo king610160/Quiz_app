@@ -13,19 +13,15 @@ passport.use(new LocalStrategy(
     },
 
     // authenticate user
-    async (req, email, password, cb, next) => {
-        try {
-            const user = await User.findOne({ 
-                where: { email },
-                attributes: { include: ['password'] } 
-            })
-            if (!user) return cb(null, false)       
-            const compare = await bcrypt.compare(password, user.password)
-            if (!compare) return cb(null, false)
-            return cb(null, user)
-        } catch(err) {
-            next(err)
-        }
+    async (req, email, password, cb) => {
+        const user = await User.findOne({ 
+            where: { email },
+            attributes: { include: ['password'] } 
+        })
+        if (!user) return cb(new Error('帳號或密碼輸入錯誤！'), null)          
+        const compare = await bcrypt.compare(password, user.password)
+        if (!compare) return cb(new Error('帳號或密碼輸入錯誤！'), null)   
+        return cb(null, user)
     }
 ))
 

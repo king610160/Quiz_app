@@ -26,8 +26,10 @@
         {{!-- right --}}
         <div class="d-flex">
             <ul class="navbar-nav">
-                {{#if users}}
-
+                {{#if user}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/users/logout"><button class="btn btn-outline-success my-sm-0 my-2">Logout</button></a>
+                </li>
                 {{else}}
                 <li class="nav-item">
                     <a class="nav-link" href="/users/login">Login</a>
@@ -37,7 +39,7 @@
                 </li>
                 {{/if}}
                 {{!-- Here will be user headshot --}}
-                {{#if users}}
+                {{#if user}}
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="/">
                         <i class="fi fi-rr-home"></i>

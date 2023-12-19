@@ -1,37 +1,34 @@
-const bcrypt = require('bcryptjs')
-const { User } = require('../../models')
-const { BadRequestError, UnauthenticatedError } = require('../../errors')
-
 const userService = require('../../services/user-service')
 
 const userController = {
     loginPage: (req, res) => {
-        res.render('users/login')
+        // const data = req.session.flash
+        const qq = req.flash('error_msg')
+        const data = {
+            error_msg : qq
+        }
+        res.render('users/login', data)
     },
     login: async (req, res) => {
-        const { email, password } = req.body
-        if(!email || !password) throw new BadRequestError('Please provide email, and password')
-
-        let user = await User.findOne({
-            where: {email : email},
-            attributes: { include: ['password'] }
-        })
-        if (!user) throw new UnauthenticatedError('Invalid email or password')
-        
-        const compare = await bcrypt.compare(password, user.password)
-        if (!compare) throw new UnauthenticatedError('Invalid email or password')
-        
+        req.flash('success_msg', '成功登入！')
         res.redirect('/quiz')
     },
     registerPage: (req, res) => {
-        res.render('users/register')
+        const data = req.session.flash
+        res.render('users/register', data)
     },
     register: async (req, res, next) => {
         userService.register(req, (err, data) => {
+            console.log(data)
             if (err) next(err)
             delete data.data.password
             res.redirect('/users/login')
         })
+    },
+    logOut: (req, res) => {
+        req.flash('success_messages', '登出成功！')
+        req.logout()
+        res.redirect('/users/login')
     },
 }
 

@@ -25,7 +25,10 @@
 
     {{!-- body, main board --}}
     <main class="mb-auto" role="main">
-        {{{ body }}}
+        <div>
+            {{> message}}
+            {{{ body }}}
+        </div>
     </main>
 
     {{!-- footer --}}
