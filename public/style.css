@@ -5,3 +5,26 @@
 .search-container {
     width: 60%;
 }
+
+.navbar-start {
+    width: 20%;
+    justify-content: start;
+}
+
+.navbar-mid {
+    width: 60%;
+    justify-content: center;
+}
+
+.navbar-end {
+    width: 20%;
+    justify-content: end;
+}
+
+.logo-href {
+    width: 35px;
+}
+
+#logo {
+    width: 100%;
+}
