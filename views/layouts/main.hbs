@@ -25,10 +25,15 @@
 
     {{!-- body, main board --}}
     <main class="mb-auto" role="main">
-        <div>
-            {{> message}}
-            {{{ body }}}
+        <div class="album container pt-5">
+            <div class="pt-5 d-flex flex-column align-items-center">
+                {{> message}}
+                {{{body}}}
+            </div>
         </div>
+            {{!-- {{> message}}
+            {{{ body }}}
+        </div> --}}
     </main>
 
     {{!-- footer --}}

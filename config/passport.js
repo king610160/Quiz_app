@@ -18,9 +18,9 @@ passport.use(new LocalStrategy(
             where: { email },
             attributes: { include: ['password'] } 
         })
-        if (!user) return cb(new Error('帳號或密碼輸入錯誤！'), null)          
+        if (!user) return cb(new Error('Email or password is not correct.'), null)          
         const compare = await bcrypt.compare(password, user.password)
-        if (!compare) return cb(new Error('帳號或密碼輸入錯誤！'), null)   
+        if (!compare) return cb(new Error('Email or password is not correct.'), null)   
         return cb(null, user)
     }
 ))

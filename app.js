@@ -43,8 +43,9 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use((req, res, next) => {
-    res.locals.success_msg = req.flash('success_msg')  // 設定 success_msg 訊息
-    res.locals.warning_msg = req.flash('warning_msg')  // 設定 warning_msg 訊息
+    res.locals.success_msg = req.flash('success_msg')  // set success_msg
+    res.locals.warning_msg = req.flash('warning_msg')  // set warning_msg
+    res.locals.error_msg = req.flash('error_msg') // set error_msg
     res.locals.user = getUser(req)
     next()
 })
