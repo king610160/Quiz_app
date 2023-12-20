@@ -21,7 +21,6 @@ const userService = {
         } catch(error) {
             return cb(error)
         }
-
     },
 }
 

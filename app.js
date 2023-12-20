@@ -20,7 +20,7 @@ app.use(express.static('public'))
 app.engine('hbs', exphbs({defaultLayout : 'main', extname: '.hbs'}))
 app.set('view engine', 'hbs')
 
-// return json
+// return json, if use api
 app.use(express.json())
 
 // bodyParser
@@ -50,7 +50,7 @@ app.use((req, res, next) => {
     next()
 })
 
-app.use('/apis/v1', apis)
+app.use('/api/v1', apis)
 app.use(pages)
 
 app.listen(port, () => {
