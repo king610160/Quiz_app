@@ -3,7 +3,7 @@ const { getUser, ensureAuthticated } = require('../helper/auth-helper')
 const authenticated = (req, res, next) => {
     if (ensureAuthticated(req)) next()
     else {
-        req.flash('error_msg','You have no authenticated to enter this route.')
+        req.flash('error_msg','Please login to check the content.')
         res.redirect('/users/login')
     }
 }
@@ -11,8 +11,10 @@ const authenticated = (req, res, next) => {
 const authenticatedAdmin = (req, res, next) => {
     if (ensureAuthticated(req)){
         if(getUser(req).isAdmin) return next()
-        res.redirect('/')
+        req.flash('error_msg','You have no authenticated to enter this route.')
+        res.redirect('/quiz')
     } else {
+        req.flash('error_msg','Please login to check the content.')
         res.redirect('/users/login')
     }
 }

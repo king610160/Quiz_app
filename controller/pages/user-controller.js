@@ -5,7 +5,7 @@ const userController = {
         res.render('users/login')
     },
     login: async (req, res) => {
-        req.flash('success_msg', '成功登入！')
+        req.flash('success_msg', 'Login success.')
         res.redirect('/quiz')
     },
     registerPage: (req, res) => {
@@ -21,7 +21,7 @@ const userController = {
     logout: (req, res, next) => {
         req.logout(function(err) {
             if (err) return next(err)
-            req.flash('success_msg', '登出成功！')
+            req.flash('success_msg', 'Logout success')
             res.redirect('/users/login')
         })
     },
