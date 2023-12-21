@@ -1,14 +1,19 @@
 const passport = require('../config/passport')
 const authenticated = (req, res, next) => {
     passport.authenticate('jwt', { session: false }, (err, user) => {
+        console.log(user)
         if (err || !user) return res.status(401).json({ status: 'error', message: 'unauthority' }) 
         req.user = user
         next()
     })(req, res, next)
 }
 const authenticatedAdmin = (req, res, next) => {
-    if (req.user && req.user.isAdmin) return next()
-    return res.status(403).json({ status: 'error', message: 'permission denied' })
+    passport.authenticate('jwt', { session: false }, (err, data) => {
+        let userData = data.toJSON()
+        if (!userData.isAdmin) return res.status(403).json({ status: 'error', message: 'permission denied' }) 
+        req.user = userData
+        next()
+    })(req, res, next)
 }
 module.exports = {
   authenticated,
