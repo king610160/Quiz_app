@@ -1,0 +1,28 @@
+<div class="w-100">
+    {{> admin-tab}}
+    <table class="table align-middle">
+    <thead class="table-dark">
+        <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">isAdmin</th>
+        <th scope="col">Manipulate</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each users}}
+        <tr class="mb-3">
+            <th scope="row" >{{this.id}}</th>
+            <td>{{this.name}}</td>
+            <td>{{this.email}}</td>
+            <td>{{this.isAdmin}}</td>
+            <td>
+                <a href="#">Edit</a>
+                <a href="#">Delete</a>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+    </table>
+</div>
