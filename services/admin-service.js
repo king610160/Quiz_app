@@ -22,7 +22,7 @@ const adminService = {
         const id = req.params.id
         const user = await User.findByPk(id)
         if (!user) return cb(new Error('This user is not existed'))
-        user.destroy()
+        await user.destroy()
         return cb(null, user)
     }
 }
