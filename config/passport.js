@@ -24,7 +24,6 @@ passport.use(new LocalStrategy(
         if (!user) return cb(new Error('Email or password is not correct.'), null)          
         const compare = await bcrypt.compare(password, user.password)
         if (!compare) return cb(new Error('Email or password is not correct.'), null) 
-        console.log('passport login')  
         return cb(null, user)
     }
 ))

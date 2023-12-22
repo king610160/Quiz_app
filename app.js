@@ -11,7 +11,29 @@ const passport = require('./config/passport')
 const session = require('express-session')
 const { getUser } = require('./helper/auth-helper')
 
+// extra security
+// const helmet = require('helmet')
+const cors = require('cors')
+const xss = require('xss-clean')
+const rateLimit = require('express-rate-limit')
+
 const { pages, apis } = require('./routes')
+
+
+// deal with security fisrt
+app.set('trust proxy', 1)
+const limiter = rateLimit({
+	windowMs: 1 * 60 * 1000, // 15 minutes
+	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
+app.use(limiter)
+// app.use(helmet())
+app.use(cors())
+app.use(xss())
+
+
 
 // set static file
 app.use(express.static('public'))
@@ -19,9 +41,6 @@ app.use(express.static('public'))
 // view's related
 app.engine('hbs', exphbs({defaultLayout : 'main', extname: '.hbs'}))
 app.set('view engine', 'hbs')
-
-// return json, if use api
-app.use(express.json())
 
 // bodyParser
 app.use(express.urlencoded({ extended : true }))
@@ -31,6 +50,9 @@ app.use(methodOverride('_method'))
 
 // flash-message
 app.use(flash())
+
+// return json
+app.use(express.json())
 
 // session
 app.use(session({

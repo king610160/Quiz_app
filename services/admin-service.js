@@ -17,6 +17,13 @@ const adminService = {
             setting
         }
         return cb(null, data)
+    },
+    deleteUser: async (req, cb) => {
+        const id = req.params.id
+        const user = await User.findByPk(id)
+        if (!user) return cb(new Error('This user is not existed'))
+        user.destroy()
+        return cb(null, user)
     }
 }
 

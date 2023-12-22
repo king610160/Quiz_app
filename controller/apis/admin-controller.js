@@ -10,6 +10,16 @@ const adminController = {
                 data
             })
         })
+    },
+    deleteUser: (req, res, next) => {
+        adminService.deleteUser(req, (err, data) => {
+            if (err) next(err)
+            delete data.password
+            res.json({
+                status: 'success',
+                data
+            })
+        })
     }
 }
 

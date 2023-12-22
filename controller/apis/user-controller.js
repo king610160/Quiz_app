@@ -24,7 +24,6 @@ const userController = {
                 token: token,
                 data: {
                     user: userData,
-                    test:'test'
                 }
             })
         } catch (error) {

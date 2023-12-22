@@ -18,8 +18,9 @@
             <td>{{this.email}}</td>
             <td>{{this.isAdmin}}</td>
             <td>
-                <a href="#">Edit</a>
-                <a href="#">Delete</a>
+                <form action="/admin/users/{{this.id}}?_method=DELETE" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
             </td>
         </tr>
         {{/each}}
