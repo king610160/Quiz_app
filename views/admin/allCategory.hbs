@@ -1,0 +1,54 @@
+<div class="w-100">
+    <h1 class="mb-5">Admin-home</h1>
+    {{> admin-tab}}
+    {{#if edit}}
+    <form action="/admin/category/{{result.id}}?_method=PUT" method="POST">
+    {{else}}
+    <form action="/admin/category" method="POST">
+    {{/if}}
+
+        <div class="row mb-3">
+            <div class="col-auto">
+                <input class="form-control" type="text" name="name" id="name" placeholder="Enter category" value="{{result.name}}" required>
+            </div>
+            {{#if edit}}
+            <div class="col-auto">
+                <button type="submit" class="btn btn-warning">Edit</button>
+                <a class="btn btn-link link-secondary" href="/admin/category">or Create New</a>
+            </div>
+            {{else}}
+            <div class="col-auto"><button type="submit" class="btn btn-success">Create</button></div>
+            {{/if}}
+        </div>
+    </form>
+
+    <br />
+
+    <table class="table align-middle">
+    <thead class="thead-dark">
+        <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each category}}
+        <tr>
+            <th scope="row">{{this.id}}</th>
+            <td>{{this.name}}</td>
+            <td>
+            <button type="button" class="btn btn-link">
+                <a class="btn btn-link link-primary" href="/admin/category/{{this.id}}">
+                    Edit
+                </a>
+            </button>
+            <form action="/admin/category/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-link link-danger" onclick="return confirm(`確定要刪除 {{ this.name }} 嗎？`)">Delete</button>
+            </form>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+    </table>
+</div>

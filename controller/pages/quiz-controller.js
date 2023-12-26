@@ -40,6 +40,9 @@ const quizController = {
             req.flash('success_msg', 'The quiz had been deleted successfully.')
             res.redirect('/quiz')
         })
+    },
+    testSetting: (req, res) => {
+        res.render('quiz/testSetting')
     }
 }
 

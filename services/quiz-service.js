@@ -75,7 +75,10 @@ const quizService = {
         if (!quiz) throw new Error('There is no that quiz existed.')
         await quiz.destroy()
         return cb(null, quiz.toJSON())
-    }
+    },
+    // testSettingPage: async (req, cb) => {
+        
+    // }
 }
 
 module.exports = quizService
