@@ -1,17 +1,17 @@
 {{#if error_msg}}
-  <div class="alert alert-danger alert-dismissible fade show {{#if user}}w-100{{else}}w-50{{/if}}" role="alert">
+  <div class="alert alert-danger alert-dismissible fade show {{#if user}}w-100{{else}}w-50{{/if}}" role="alert" data-bs-autohide="true" data-bs-delay="2000">
     {{ error_msg }}
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
 {{/if}}
 {{#if success_msg}}
-  <div class="alert alert-success alert-dismissible fade show {{#if user}}w-100{{else}}w-50{{/if}}" role="alert">
+  <div class="alert alert-success alert-dismissible fade show {{#if user}}w-100{{else}}w-50{{/if}}" role="alert" data-bs-autohide="true" data-bs-delay="2000">
     {{ success_msg }}
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
 {{/if}}
 {{#if warning_msg}}
-  <div class="alert alert-warning alert-dismissible fade show {{#if user}}w-100{{else}}w-50{{/if}}" role="alert">
+  <div class="alert alert-warning alert-dismissible fade show {{#if user}}w-100{{else}}w-50{{/if}}" role="alert" data-bs-autohide="true" data-bs-delay="2000">
     {{ warning_msg }}
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>

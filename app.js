@@ -10,6 +10,7 @@ const flash = require('connect-flash')
 const passport = require('./config/passport')
 const session = require('express-session')
 const { getUser } = require('./helper/auth-helper')
+const handlebarsHelper = require('./helper/handlebars-helper')
 
 // extra security
 // const helmet = require('helmet')
@@ -39,7 +40,7 @@ app.use(xss())
 app.use(express.static('public'))
 
 // view's related
-app.engine('hbs', exphbs({defaultLayout : 'main', extname: '.hbs'}))
+app.engine('hbs', exphbs({defaultLayout : 'main', extname: '.hbs', helpers: handlebarsHelper}))
 app.set('view engine', 'hbs')
 
 // bodyParser

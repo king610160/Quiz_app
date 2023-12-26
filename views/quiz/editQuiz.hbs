@@ -1,7 +1,6 @@
 <h1 class="mb-3">Edit Quiz</h1>
 <div class="w-100 mt-3">
-    <form action="/quiz/{{quiz.id}}?_method=PUT" 
-          method="POST">
+    <form action="/quiz/{{quiz.id}}?_method=PUT" method="POST">
           {{>quiz-create-and-edit}}
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>

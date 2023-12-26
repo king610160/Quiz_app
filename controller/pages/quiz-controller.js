@@ -6,9 +6,6 @@ const quizController = {
     home: (req, res, next) => {
         quizService.home(req, (err, data) => {
             if (err) next(err)
-            data.forEach((e) => {
-                e.hook = `${e.id}select${e.answer}`
-            })
             res.render('quiz/home', {quiz: data})
         })
     },

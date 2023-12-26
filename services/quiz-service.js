@@ -10,6 +10,10 @@ const quizService = {
             raw:true,
             nest:true,
         })
+        quiz.forEach((e) => {
+            let check = `${e.answer}true`
+            e[check] = true
+        })
         return cb(null, quiz)
     },
     postQuiz: async (req, cb) => {
@@ -23,26 +27,28 @@ const quizService = {
                 select2,
                 select3,
                 select4,
-                answer
+                answer,
+                userId: req.user.id
             })
             return cb(null, quiz)
         } catch (err) {
             return cb(err)
         }
-
     },
     editQuizPage: async (req, cb) => {
         let id = req.params.id
         let quiz = await Quiz.findByPk(id)
         if (!quiz) throw new Error('There is no that quiz existed.')
         quiz = quiz.toJSON()
-        for(const key in quiz) {
-            if (key.includes(quiz.answer.toString())) quiz.checked = key
-        }
         let data = {
             quiz
         }
-        console.log(data)
+        for(const key in quiz) {
+            if (key.includes(quiz.answer.toString())) {
+                let check = `${key}true`
+                data[check] = true
+            }
+        }
         return cb(null, data)
     },
     editQuiz: async (req, cb) => {

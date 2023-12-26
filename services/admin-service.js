@@ -24,7 +24,8 @@ const adminService = {
         if (!user) return cb(new Error('This user is not existed'))
         await user.destroy()
         return cb(null, user)
-    }
+    },
+
 }
 
 module.exports = adminService
