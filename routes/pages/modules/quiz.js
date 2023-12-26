@@ -6,7 +6,7 @@ const quizController = require('../../../controller/pages/quiz-controller')
 router.get('/create', quizController.createQuizPage)
 router.get('/:id', quizController.editQuizPage)
 router.delete('/:id', quizController.deleteQuiz)
-// router.put('/:id', quizController.putQuiz)
+router.put('/:id', quizController.editQuiz)
 router.post('/', quizController.postQuiz)
 router.get('/', quizController.home)
 
