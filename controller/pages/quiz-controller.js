@@ -3,10 +3,13 @@ const quizService = require('../../services/quiz-service')
 
 const quizController = {
     // home may put personnel info
-    home: (req, res, next) => {
-        quizService.home(req, (err, data) => {
+    homePage: (req, res) => {
+        res.render('quiz/homePage')
+    },
+    quizPage: (req, res, next) => {
+        quizService.quiz(req, (err, data) => {
             if (err) next(err)
-            res.render('quiz/home', {quiz: data})
+            res.render('quiz/quiz', {quiz: data})
         })
     },
     createQuizPage: (req, res) => {

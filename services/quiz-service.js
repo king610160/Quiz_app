@@ -2,7 +2,8 @@ const { Quiz } = require('../models')
 
 const quizService = {
     // home may put personnel info
-    home: async(req, cb) => {
+    quiz: async(req, cb) => {
+        // const searchValue = req.query.search
         const quiz = await Quiz.findAll({
             where: {
                 user_id: req.user.id

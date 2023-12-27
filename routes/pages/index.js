@@ -11,8 +11,8 @@ const { authenticated, authenticatedAdmin } = require('../../middleware/auth')
 const { generalErrorHandler } = require('../../middleware/error-handler')
 
 router.use('/admin', authenticatedAdmin, admin)
-router.use('/quiz', authenticated, quiz)
 router.use('/users', users)
+router.use('/', authenticated, quiz)
 
 router.use('/', (req, res) => res.redirect('/users/login'))
 router.use('/', generalErrorHandler)  // use function

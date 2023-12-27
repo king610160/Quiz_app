@@ -6,7 +6,7 @@ const userController = {
     },
     login: async (req, res) => {
         req.flash('success_msg', 'Login success.')
-        res.redirect('/quiz')
+        res.redirect('/home')
     },
     registerPage: (req, res) => {
         res.render('users/register')

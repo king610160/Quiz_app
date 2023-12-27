@@ -2,15 +2,18 @@
     <div class="container-fluid d-flex flex-row">
         {{!-- left : make plan and test, may not display until login --}}
         <div class="d-flex navbar-start">
-            <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
-                <a href="/{{#if user}}quiz{{/if}}"class="logo-href">
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                <a href="/{{#if user}}home{{/if}}"class="logo-href">
                     <img src="/image/logo.webp" alt="question-mark" id="logo">
                 </a>
                 <li class="nav-item mx-3 left-nav">
-                    <a class="nav-link" href="/quiz/plan">Plan</a>
+                    <a class="nav-link" href="/plan">Plan</a>
                 </li>
                 <li class="nav-item mx-3 left-nav">
-                    <a class="nav-link" href="/quiz/test/select">Test</a>
+                    <a class="nav-link" href="/test">Test</a>
+                </li>
+                <li class="nav-item mx-3 left-nav">
+                    <a class="nav-link" href="/quiz">Quiz</a>
                 </li>
             </ul>
         </div>
@@ -18,8 +21,8 @@
         {{!-- middle : Search bar --}}
         {{#if user}}
         <div class="d-flex navbar-mid search-container">
-            <form class="d-flex w-100">
-                <input class="form-control me-2 search w-100" type="search" placeholder="Search" aria-label="Search">
+            <form action="/quiz" class="d-flex w-100">
+                <input class="form-control me-2 search w-100" type="search" name="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
         </div>
@@ -27,7 +30,6 @@
 
         {{!-- right : For user login/register, after login become logout and personnel profile... --}}
         <div class="d-flex align-items-center navbar-end">
-
             <ul class="navbar-nav align-items-center mx-2">
                 {{#if user}}
                     <li class="nav-item mx-4">
