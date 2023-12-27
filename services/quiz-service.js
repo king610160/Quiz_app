@@ -1,4 +1,4 @@
-const { Quiz } = require('../models')
+const { Quiz, Plan } = require('../models')
 
 const quizService = {
     // home may put personnel info
@@ -77,9 +77,30 @@ const quizService = {
         await quiz.destroy()
         return cb(null, quiz.toJSON())
     },
-    // testSettingPage: async (req, cb) => {
-        
-    // }
+    planPage: async (req, cb) => {
+        // const id = req.user.id
+        const result = await Plan.findAll({
+            raw: true,
+            nest: true
+        })
+        const plan = {
+            plan: result
+        }
+        return cb(null, plan)
+    },
+    postPlan: async (req, cb) => {
+        let { name } = req.body
+        const id = req.user.id
+        const plan = await Plan.create({
+            name,
+            userId:id
+        })
+        return cb(null, plan.toJSON())
+    },
+    singlePlanPage: async (req, cb) => {
+        // const id = req.params.id
+        return cb(null)
+    }
 }
 
 module.exports = quizService

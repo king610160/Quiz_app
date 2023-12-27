@@ -8,7 +8,9 @@ router.get('/test', quizController.testSelect)
 // router.get('/test')
 
 // plan, make plan
-router.get('/plan', quizController.planHome)
+router.get('/plan/:id', quizController.singlePlanPage)
+router.get('/plan', quizController.planPage)
+router.post('/plan', quizController.postPlan)
 
 // homePage
 router.get('/home', quizController.homePage)
@@ -21,6 +23,6 @@ router.put('/quiz/:id', quizController.editQuiz)
 router.post('/quiz', quizController.postQuiz)
 router.get('/quiz', quizController.quizPage)
 
-router.use('/', (req, res) => res.redirect('/quiz'))
+router.use('/', (req, res) => res.redirect('/home'))
 
 module.exports = router
