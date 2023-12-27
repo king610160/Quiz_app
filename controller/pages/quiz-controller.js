@@ -41,8 +41,11 @@ const quizController = {
             res.redirect('/quiz')
         })
     },
-    testSetting: (req, res) => {
-        res.render('quiz/testSetting')
+    testSelect: (req, res) => {
+        res.render('quiz/test/testSelect')
+    },
+    planHome: (req, res) => {
+        res.render('quiz/plan/planHome')
     }
 }
 

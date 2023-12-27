@@ -7,7 +7,7 @@ const adminController = require('../../../controller/pages/admin-controller')
 router.delete('/users/:id', adminController.deleteUser)
 router.get('/users', adminController.getAllUsers)
 
-// admin's quiz manipulate
+// admin's quiz manipulate, will add thumb and disthumb, may can justify what quiz is bad
 router.get('/quiz', adminController.getAllQuiz)
 
 // admin's category manipulate

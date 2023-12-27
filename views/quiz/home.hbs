@@ -18,7 +18,7 @@
   <tbody>
       {{#each quiz}}
       <tr class="mb-3 align-items-center">
-          <th scope="row" >{{inc @index}}</th>
+          <th scope="row">{{inc @index}}</th>
           <th scope="row">
             <p class="d-inline-flex gap-1">
               <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample{{this.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
@@ -26,18 +26,26 @@
               </a>
             </p>
             <div class="collapse" id="collapseExample{{this.id}}">
-                <div class="card card-body {{this.id}} select1 {{#if select1true}}bg-secondary text-white{{/if}}">
-                  {{this.select1}}
-                </div>
-                <div class="card card-body {{this.id}} select2 {{#if select2true}}bg-secondary text-white{{/if}}">
-                  {{this.select2}}
-                </div>
-                <div class="card card-body {{this.id}} select3 {{#if select3true}}bg-secondary text-white{{/if}}">
-                  {{this.select3}}
-                </div>
-                <div class="card card-body {{this.id}} select4 {{#if select4true}}bg-secondary text-white{{/if}}">
-                  {{this.select4}}
-                </div>
+                {{#if select1}}
+                  <div class="card card-body {{this.id}} select1 {{#if select1true}}bg-secondary text-white{{/if}}">
+                    {{this.select1}}
+                  </div>
+                {{/if}}
+                {{#if select2}}
+                  <div class="card card-body {{this.id}} select2 {{#if select2true}}bg-secondary text-white{{/if}}">
+                    {{this.select2}}
+                  </div>
+                {{/if}}
+                {{#if select3}}
+                  <div class="card card-body {{this.id}} select3 {{#if select3true}}bg-secondary text-white{{/if}}">
+                    {{this.select3}}
+                  </div>
+                {{/if}}
+                {{#if select4}}
+                  <div class="card card-body {{this.id}} select4 {{#if select4true}}bg-secondary text-white{{/if}}">
+                    {{this.select4}}
+                  </div>
+                {{/if}}
             </div>
           </th>
           <th scope="row">

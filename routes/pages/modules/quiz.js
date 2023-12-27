@@ -3,11 +3,14 @@ const router = express.Router()
 
 const quizController = require('../../../controller/pages/quiz-controller')
 
-//
-router.get('/test/setting')
-router.get('/test')
+// test : select what plan want to test
+router.get('/test/select', quizController.testSelect)
+// router.get('/test')
 
-// quiz page's CURD
+// plan, make plan
+router.get('/plan', quizController.planHome)
+
+// quiz page's CURD, make quiz
 router.get('/create', quizController.createQuizPage)
 router.get('/:id', quizController.editQuizPage)
 router.delete('/:id', quizController.deleteQuiz)
