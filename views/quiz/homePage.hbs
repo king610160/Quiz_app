@@ -72,12 +72,8 @@
         </div>
         <div class="d-flex flex-row align-items-center">
             {{!-- set a default and add it to the collection --}}
-            <form action="/quiz/{{this.id}}" class="me-3">
+            <form action="/user/collect/{{this.id}}" method="POST" class="me-3">
                 <button type="submit" class="btn btn-success fw-bold">十</button>
-            </form>
-
-            <form action="/quiz/{{this.id}}?_method=DELETE" method="POST" class="me-3">
-                <button type="submit" class="btn btn-danger fw-bold">一</button>
             </form>
         </div>
     </div>

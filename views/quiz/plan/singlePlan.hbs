@@ -1,1 +1,63 @@
-<h1>Single Plan</h1>
+
+<div class="w-100">
+    <h1>Plan : {{plan.name}}</h1>
+</div>
+
+<br>
+<hr>
+<br>
+
+<div class="w-100">
+  <table class="table align-middle">
+  <thead class="table-light">
+      <tr>
+      <th scope="col">Id</th>
+      <th scope="col">Question</th>
+      <th scope="col">Manipulate</th>
+      </tr>
+  </thead>
+  <tbody>
+      {{#each plan.PlanCollectToQuiz}}
+      <tr class="mb-3 align-items-center">
+          <th scope="row">{{inc @index}}</th>
+          <th scope="row">
+            <p class="d-inline-flex gap-1">
+              <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample{{this.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                {{this.question}}
+              </a>
+            </p>
+            <div class="collapse" id="collapseExample{{this.id}}">
+                {{#if select1}}
+                  <div class="card card-body {{this.id}} select1 {{#if select1true}}bg-secondary text-white{{/if}}">
+                    {{this.select1}}
+                  </div>
+                {{/if}}
+                {{#if select2}}
+                  <div class="card card-body {{this.id}} select2 {{#if select2true}}bg-secondary text-white{{/if}}">
+                    {{this.select2}}
+                  </div>
+                {{/if}}
+                {{#if select3}}
+                  <div class="card card-body {{this.id}} select3 {{#if select3true}}bg-secondary text-white{{/if}}">
+                    {{this.select3}}
+                  </div>
+                {{/if}}
+                {{#if select4}}
+                  <div class="card card-body {{this.id}} select4 {{#if select4true}}bg-secondary text-white{{/if}}">
+                    {{this.select4}}
+                  </div>
+                {{/if}}
+            </div>
+          </th>
+          <th scope="row">
+              <div class="d-flex flex-row t-25">
+                <form action="/quiz/{{this.id}}?_method=DELETE" method="POST" class="me-3">
+                    <button type="submit" class="btn btn-danger">Delete Quiz</button>
+                </form>
+              </div>
+          </th>
+      </tr>
+      {{/each}}
+  </tbody>
+  </table>
+</div>

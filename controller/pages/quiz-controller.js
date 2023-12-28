@@ -71,9 +71,15 @@ const quizController = {
         })
     },
     singlePlanPage: (req, res, next) => {
-        quizService.singlePlanPage(req, (err) => {
+        quizService.singlePlanPage(req, (err, data) => {
             if(err) return next(err)
-            res.render('quiz/plan/singlePlan')
+            res.render('quiz/plan/singlePlan', data)
+        })
+    },
+    quizAddToCollection: (req, res, next) => {
+        quizService.quizAddToCollection(req, (err) => {
+            if(err) return next(err)
+            res.redirect('back')
         })
     }
 }

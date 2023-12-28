@@ -15,6 +15,7 @@ router.post('/plan', quizController.postPlan)
 
 // homePage
 router.get('/home', quizController.home)
+router.post('/user/collect/:id', quizController.quizAddToCollection)
 
 // quiz page's CURD, make quiz
 router.get('/quiz/create', quizController.createQuizPage)

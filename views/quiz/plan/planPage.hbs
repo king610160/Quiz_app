@@ -2,37 +2,36 @@
 
 <div class="w-100 mt-3">
     <h1 class="mb-5">Create Plan</h1>
-    
-        <div class="d-flex flex-row mb-3 justify-content-between">
-            <form action="/plan" method="POST">
-                <div class="d-flex flex-row mx-2">
-                    <div class="col-auto mx-2">
-                        <input class="form-control" type="text" name="name" id="name" placeholder="Enter folder name" value="" aria-describedby="nameHelp" required>
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-success">Create folder</button>
-                    </div>
+    <div class="d-flex flex-row mb-3 justify-content-between">
+        <form action="/plan" method="POST">
+            <div class="d-flex flex-row mx-2">
+                <div class="col-auto mx-2">
+                    <input class="form-control" type="text" name="name" id="name" placeholder="Enter folder name" value="" aria-describedby="nameHelp" required>
                 </div>
-            </form>
-            <div class="col-auto right-0">
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {{#if update}}
-                            {{update.defaultFolder}}
-                        {{else}}
-                            Dropdown button
-                        {{/if}}
-                    </button>
-                    <ul class="dropdown-menu">
-                        {{#each plan}}
-                        <form action="/plan/defaultFolder/{{this.id}}" method="POST">
-                            <li><button class="dropdown-item" type="submit">{{this.name}}</button></li>
-                        </form>
-                        {{/each}}
-                    </ul>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-success">Create folder</button>
                 </div>
             </div>
+        </form>
+        <div class="col-auto right-0">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{#if update}}
+                        {{update.defaultFolder}}
+                    {{else}}
+                        Dropdown button
+                    {{/if}}
+                </button>
+                <ul class="dropdown-menu">
+                    {{#each plan}}
+                    <form action="/plan/defaultFolder/{{this.id}}" method="POST">
+                        <li><button class="dropdown-item" type="submit">{{this.name}}</button></li>
+                    </form>
+                    {{/each}}
+                </ul>
+            </div>
         </div>
+    </div>
 </div>
 
 

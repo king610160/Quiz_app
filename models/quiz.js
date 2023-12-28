@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
       Quiz.belongsToMany(models.Plan, {
         through: models.Collection, // through collection to make contact
         foreignKey: 'quizId', // set foreign key
-        as: 'QuizBeCollectToPlan' // name this relation
+        as: 'PlanCollectToQuiz' // name this relation
       })
     }
   }
@@ -27,6 +27,9 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'Quiz',
     tableName: 'Quizzes',
     underscored: true,
+    defaultScope: {
+      attributes: { exclude: ['Collection'] }
+    }
   })
   return Quiz
 }

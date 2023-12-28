@@ -1,4 +1,4 @@
-const { User, Quiz, Plan } = require('../models')
+const { User, Quiz, Plan, Collection } = require('../models')
 const { Sequelize } = require('sequelize')
 const { toPackage } = require('../helper/api-helper')
 
@@ -8,37 +8,26 @@ const quizService = {
         // if have search value
         const searchValue = req.query.search
         if(!searchValue) return cb(null)
-        const [quiz, plan]= await Promise.all([
-            Quiz.findAll({
-                where: {
-                    question: {
-                        [Sequelize.Op.like]: `%${searchValue}%`
-                    }
-                },
-                raw: true,
-                nest: true
-            }),
-            Plan.findAll({
-                where: {
-                    name: {
-                        [Sequelize.Op.like]: `%${searchValue}%`
-                    }
-                },
-                raw: true,
-                nest: true
-            })
-        ])
+        const quiz= await Quiz.findAll({
+            where: {
+                question: {
+                    [Sequelize.Op.like]: `%${searchValue}%`
+                }
+            },
+            raw: true,
+            nest: true
+        })
+
         quiz.forEach((e) => {
             let check = `${e.answer}true`
             e[check] = true
         })
+
         let data = toPackage('success', undefined)
         data = {
             ...data,
             quiz: quiz,
-            plan: plan
         }
-        console.log(data)
         return cb(null, data)
     },
     quiz: async(req, cb) => {
@@ -154,7 +143,29 @@ const quizService = {
         return cb(null, result)
     },
     singlePlanPage: async (req, cb) => {
-        // const id = req.params.id
+        const id = req.params.id
+        const plan = await Plan.findByPk(id, {
+            include: [{
+              model: Quiz,
+              as: 'PlanCollectToQuiz',
+            }],
+        })
+        let deal =  plan.toJSON()
+        for (let i of deal.PlanCollectToQuiz) delete i.Collection
+        const result = {
+            plan: deal
+        }
+        return cb(null, result)
+    },
+    quizAddToCollection: async (req, cb) => {
+        // quizId
+        const quizId = req.params.id
+        const planId = req.user.defaultFolder
+        const result = await Collection.create({
+            quizId,
+            planId
+        })
+        if(!result) throw new Error('Update fail')
         return cb(null)
     }
 }
