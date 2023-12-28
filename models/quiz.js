@@ -4,14 +4,14 @@ const {
 } = require('sequelize')
 module.exports = (sequelize, DataTypes) => {
   class Quiz extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
       Quiz.belongsTo(models.User, {foreignKey: 'userId'})
       Quiz.belongsTo(models.Category, {foreignKey: 'categoryId'})
+      Quiz.belongsToMany(models.Plan, {
+        through: models.Collection, // through collection to make contact
+        foreignKey: 'quizId', // set foreign key
+        as: 'QuizBeCollectToPlan' // name this relation
+      })
     }
   }
   Quiz.init({

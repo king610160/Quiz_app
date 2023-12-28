@@ -1,1 +1,88 @@
-<h1>HomePage</h1>
+{{#if status}}
+{{else}}
+    <div class="d-flex flex-row flex-wrap justify-content-start w-100">
+        <h1 class="mb-5">HomePage</h1>
+    </div>
+{{/if}}
+
+
+
+
+{{#if plan}}
+    <div class="d-flex justify-content-start w-100">
+        <h3 class="mx-3">Plan</h3>
+    </div>
+    <div class="d-flex flex-row flex-wrap justify-content-start w-100">
+    {{#each plan}}
+        <div class="card p-2 m-3" style="width: 18rem;">
+            <div class="card-body">
+                <h3 class="card-title">{{this.name}}</h5>
+                <br>
+                <br>
+                <div class="d-flex justify-content-end">
+                    <a href="/plan/{{this.id}}" class="btn btn-primary mx-1">Check</a>
+                    <a href="#" class="btn btn-primary mx-1">Test</a>
+                </div>
+            </div>
+        </div>
+    {{/each}}
+    </div>
+    <br>
+    <hr class="border border-2 border-dark w-100">
+    <br>
+{{/if}}
+
+
+
+{{#if quiz}}
+<div class="d-flex justify-content-start w-100 mb-3">
+    <h3 class="mx-3">Quiz</h3>
+</div>
+<div class="w-100 p-3">
+    {{#each quiz}}
+    <div class="card d-flex flex-row w-100 justify-content-between" style="width: 18rem;">
+        <div class="card-body d-flex flex-column">
+            <p class="d-inline-flex gap-1">
+            <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample{{this.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                {{this.question}}
+            </a>
+            </p>
+            <div class="collapse" id="collapseExample{{this.id}}">
+                {{#if select1}}
+                <div class="card card-body {{this.id}} select1 {{#if select1true}}bg-secondary text-white{{/if}}">
+                    {{this.select1}}
+                </div>
+                {{/if}}
+                {{#if select2}}
+                <div class="card card-body {{this.id}} select2 {{#if select2true}}bg-secondary text-white{{/if}}">
+                    {{this.select2}}
+                </div>
+                {{/if}}
+                {{#if select3}}
+                <div class="card card-body {{this.id}} select3 {{#if select3true}}bg-secondary text-white{{/if}}">
+                    {{this.select3}}
+                </div>
+                {{/if}}
+                {{#if select4}}
+                <div class="card card-body {{this.id}} select4 {{#if select4true}}bg-secondary text-white{{/if}}">
+                    {{this.select4}}
+                </div>
+                {{/if}}
+            </div>
+        </div>
+        <div class="d-flex flex-row align-items-center">
+            {{!-- set a default and add it to the collection --}}
+            <form action="/quiz/{{this.id}}" class="me-3">
+                <button type="submit" class="btn btn-success fw-bold">十</button>
+            </form>
+
+            <form action="/quiz/{{this.id}}?_method=DELETE" method="POST" class="me-3">
+                <button type="submit" class="btn btn-danger fw-bold">一</button>
+            </form>
+        </div>
+    </div>
+    {{/each}}
+</div>
+{{else}}
+{{!-- if no searching, need to put some thing here --}}
+{{/if}}

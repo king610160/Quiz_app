@@ -1,9 +1,47 @@
-const { Quiz, Plan } = require('../models')
+const { User, Quiz, Plan } = require('../models')
+const { Sequelize } = require('sequelize')
+const { toPackage } = require('../helper/api-helper')
 
 const quizService = {
-    // home may put personnel info
+    home: async(req, cb) => {
+        // if no search value, then need to do something here.
+        // if have search value
+        const searchValue = req.query.search
+        if(!searchValue) return cb(null)
+        const [quiz, plan]= await Promise.all([
+            Quiz.findAll({
+                where: {
+                    question: {
+                        [Sequelize.Op.like]: `%${searchValue}%`
+                    }
+                },
+                raw: true,
+                nest: true
+            }),
+            Plan.findAll({
+                where: {
+                    name: {
+                        [Sequelize.Op.like]: `%${searchValue}%`
+                    }
+                },
+                raw: true,
+                nest: true
+            })
+        ])
+        quiz.forEach((e) => {
+            let check = `${e.answer}true`
+            e[check] = true
+        })
+        let data = toPackage('success', undefined)
+        data = {
+            ...data,
+            quiz: quiz,
+            plan: plan
+        }
+        console.log(data)
+        return cb(null, data)
+    },
     quiz: async(req, cb) => {
-        // const searchValue = req.query.search
         const quiz = await Quiz.findAll({
             where: {
                 user_id: req.user.id
@@ -78,8 +116,11 @@ const quizService = {
         return cb(null, quiz.toJSON())
     },
     planPage: async (req, cb) => {
-        // const id = req.user.id
+        const id = req.user.id
         const result = await Plan.findAll({
+            where: {
+                userId: id
+            },
             raw: true,
             nest: true
         })
@@ -96,6 +137,21 @@ const quizService = {
             userId:id
         })
         return cb(null, plan.toJSON())
+    },
+    changeDefaultFolder: async (req, cb) => {
+        const userId = req.user.id
+        const id = req.params.id
+        const user = await User.findByPk(userId)
+        const update = await user.update({
+            defaultFolder:id  
+        })
+        const plan = await Plan.findByPk(id)
+        const result = {
+            update: update.toJSON(),
+            plan: plan.toJSON()
+        }
+        console.log(result)
+        return cb(null, result)
     },
     singlePlanPage: async (req, cb) => {
         // const id = req.params.id

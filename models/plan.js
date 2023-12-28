@@ -9,8 +9,12 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate() {
-      // define association here
+    static associate(models) {
+      Plan.belongsToMany(models.Quiz, {
+        through: models.Collection, // through collection to make contact
+        foreignKey: 'planId', // set foreign key
+        as: 'PlanCollectToQuiz' // name this relation
+      })
     }
   }
   Plan.init({

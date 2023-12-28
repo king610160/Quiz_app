@@ -3,8 +3,12 @@ const quizService = require('../../services/quiz-service')
 
 const quizController = {
     // home may put personnel info
-    homePage: (req, res) => {
-        res.render('quiz/homePage')
+    home: (req, res, next) => {
+        quizService.home(req, (err, data) => {
+            if(err) next(err)
+            res.render('quiz/homePage', data)
+        })
+        
     },
     quizPage: (req, res, next) => {
         quizService.quiz(req, (err, data) => {
@@ -54,9 +58,15 @@ const quizController = {
         })
     },
     postPlan: (req, res, next) => {
-        quizService.postPlan(req, (err, data) => {
+        quizService.postPlan(req, (err) => {
             if (err) return next(err)
-            console.log(data)
+            res.redirect('/plan')
+        })
+    },
+    changeDefaultFolder: (req, res, next) => {
+        quizService.changeDefaultFolder(req, (err, data) => {
+            if (err) return next(err)
+            res.local = data
             res.redirect('/plan')
         })
     },

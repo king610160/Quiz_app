@@ -8,12 +8,13 @@ router.get('/test', quizController.testSelect)
 // router.get('/test')
 
 // plan, make plan
+router.post('/plan/defaultFolder/:id', quizController.changeDefaultFolder)
 router.get('/plan/:id', quizController.singlePlanPage)
 router.get('/plan', quizController.planPage)
 router.post('/plan', quizController.postPlan)
 
 // homePage
-router.get('/home', quizController.homePage)
+router.get('/home', quizController.home)
 
 // quiz page's CURD, make quiz
 router.get('/quiz/create', quizController.createQuizPage)
