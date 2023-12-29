@@ -32,9 +32,6 @@
         <div class="d-flex align-items-center navbar-end">
             <ul class="navbar-nav align-items-center mx-2">
                 {{#if user}}
-                    <li class="nav-item mx-4">
-                        <h4>Hi {{user.name}}</h4>
-                    </li>
                     {{#if user.isAdmin}}
                         <li class="nav-item mx-2">
                             <a class="nav-link" href="/admin/users">Admin</a>
@@ -55,8 +52,8 @@
                 {{!-- Here will be user headshot --}}
                 {{#if user}}
                     <li class="nav-item mx-2">
-                        <a class="nav-link active" aria-current="page" href="/">
-                            <i class="fi fi-rr-home"></i>
+                        <a data-bs-toggle="offcanvas" href="#offcanvasExample" aria-controls="offcanvasExample">
+                            <img src="/image/girl.jpeg" alt="headshot" class="navheadshot">
                         </a>
                     </li>
                 {{/if}}
@@ -64,4 +61,5 @@
         </div>
 
     </div>
+                        
 </nav>

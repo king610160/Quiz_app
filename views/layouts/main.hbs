@@ -24,6 +24,20 @@
     {{> header}}
 
     {{!-- body, main board --}}
+    {{#if user}}
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+        <div class="offcanvas-header ">
+            <img src="/image/girl.jpeg" alt="headshot" class="headshot">
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div>
+                Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.
+            </div>
+        </div>
+    </div>
+    {{/if}}
+
     <main class="mb-auto h-100" role="main">
         <div class="album container pt-5 h-100">
             <div class="pt-5 d-flex flex-column align-items-center justify-content-start h-100">

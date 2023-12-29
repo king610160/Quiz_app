@@ -66,7 +66,7 @@ const quizController = {
     changeDefaultFolder: (req, res, next) => {
         quizService.changeDefaultFolder(req, (err, data) => {
             if (err) return next(err)
-            res.local = data
+            req.flash('success_msg',`Your default folder had changed to ${data.plan.name}`)
             res.redirect('/plan')
         })
     },

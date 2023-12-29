@@ -8,7 +8,7 @@ const quizService = {
         // if have search value
         const searchValue = req.query.search
         if(!searchValue) return cb(null)
-        const quiz= await Quiz.findAll({
+        const quiz = await Quiz.findAll({
             where: {
                 question: {
                     [Sequelize.Op.like]: `%${searchValue}%`
@@ -19,8 +19,7 @@ const quizService = {
         })
 
         quiz.forEach((e) => {
-            let check = `${e.answer}true`
-            e[check] = true
+            e[`${e.answer}true`] = true
         })
 
         let data = toPackage('success', undefined)
@@ -106,17 +105,25 @@ const quizService = {
     },
     planPage: async (req, cb) => {
         const id = req.user.id
-        const result = await Plan.findAll({
-            where: {
-                userId: id
-            },
-            raw: true,
-            nest: true
-        })
-        const plan = {
-            plan: result
+        const [plan, user] = await Promise.all([
+            Plan.findAll({
+                where: {
+                    userId: id
+                },
+                raw: true,
+                nest: true
+            }),
+            User.findByPk(id, {
+                include: [{model: Plan}]
+            })
+        ])
+        
+        let result = {
+            plan: plan,
+            user: user.toJSON()
         }
-        return cb(null, plan)
+
+        return cb(null, result)
     },
     postPlan: async (req, cb) => {
         let { name } = req.body
@@ -132,14 +139,15 @@ const quizService = {
         const id = req.params.id
         const user = await User.findByPk(userId)
         const update = await user.update({
-            defaultFolder:id  
+            planId: id
         })
-        const plan = await Plan.findByPk(id)
+        const plan = await Plan.findByPk(id,{
+            attributes: ['id','name']
+        })
         const result = {
             update: update.toJSON(),
             plan: plan.toJSON()
         }
-        console.log(result)
         return cb(null, result)
     },
     singlePlanPage: async (req, cb) => {
@@ -151,16 +159,20 @@ const quizService = {
             }],
         })
         let deal =  plan.toJSON()
-        for (let i of deal.PlanCollectToQuiz) delete i.Collection
+        for (let i of deal.PlanCollectToQuiz) {
+            delete i.Collection
+            const check = i.answer
+            i[`${check}true`] = true
+        }
         const result = {
             plan: deal
         }
         return cb(null, result)
     },
     quizAddToCollection: async (req, cb) => {
-        // quizId
         const quizId = req.params.id
-        const planId = req.user.defaultFolder
+        const planId = req.user.planId
+        console.log(req.user)
         const result = await Collection.create({
             quizId,
             planId

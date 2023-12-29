@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
       User.hasMany(models.Quiz, {foreignKey: 'userId'})
+      User.belongsTo(models.Plan, { foreignKey: 'planId' })
     }
   }
   User.init({
@@ -13,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     password: DataTypes.STRING,
     isAdmin: DataTypes.BOOLEAN,
-    defaultFolder: DataTypes.INTEGER
+    planId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'User',
