@@ -9,13 +9,15 @@ router.get('/test', quizController.testSelect)
 
 // plan, make plan
 router.post('/plan/defaultFolder/:id', quizController.changeDefaultFolder)
+// not finish delete function
+router.delete('/plan/:id', quizController.singlePlanDeleteQuiz)
 router.get('/plan/:id', quizController.singlePlanPage)
 router.get('/plan', quizController.planPage)
 router.post('/plan', quizController.postPlan)
 
 // homePage
 router.get('/home', quizController.home)
-router.post('/user/collect/:id', quizController.quizAddToCollection)
+router.post('/user/collect/:id', quizController.quizAddToPlan)
 
 // quiz page's CURD, make quiz
 router.get('/quiz/create', quizController.createQuizPage)

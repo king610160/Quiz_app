@@ -20,7 +20,9 @@
             <td>{{this.isAdmin}}</td>
             <td>
                 <form action="/admin/users/{{this.id}}?_method=DELETE" method="POST">
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="submit" class="btn btn-danger icon">
+                        <i class="fa-regular fa-trash"></i>
+                    </button>
                 </form>
             </td>
         </tr>

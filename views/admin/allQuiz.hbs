@@ -14,7 +14,7 @@
         {{#each quiz}}
         <tr class="mb-3 align-items-center">
             <th scope="row" >{{this.id}}</th>
-            <th scope="row align-items-center mx-auto">
+            <th scope="row d-flex align-items-center mx-auto">
                 <p class="d-inline-flex ">
                     <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample{{this.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
                         {{this.question}}
@@ -46,7 +46,9 @@
             <th scope="row">
                 <div class="d-flex flex-row t-25">
                     <form action="/quiz/{{this.id}}?_method=DELETE" method="POST" class="me-3">
-                        <button type="submit" class="btn btn-danger">Delete Quiz</button>
+                        <button type="submit" class="btn btn-danger icon">
+                            <i class="fa-regular fa-trash"></i>
+                        </button>
                     </form>
                 </div>
             </th>

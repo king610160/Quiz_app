@@ -169,10 +169,37 @@ const quizService = {
         }
         return cb(null, result)
     },
-    quizAddToCollection: async (req, cb) => {
+    singlePlanDeleteQuiz: async (req, cb) => {
+        try {
+            const quizId = req.params.id
+            const planId = req.body.planId
+            const find = await Collection.findOne({
+                where:{
+                    quizId,
+                    planId
+                }
+            })
+            if(!find) return cb(new Error('There is no this quiz in the plan'))
+            find.destroy()
+            let result = {
+                find,
+                planId
+            }
+            return cb(null, result)
+        }catch(err) {
+            return cb(false)
+        }
+    },
+    quizAddToPlan: async (req, cb) => {
         const quizId = req.params.id
         const planId = req.user.planId
-        console.log(req.user)
+        const find = await Collection.findOne({
+            where:{
+                quizId,
+                planId
+            }
+        })
+        if (find) return cb(new Error('Already collect it in the default folder.'))
         const result = await Collection.create({
             quizId,
             planId

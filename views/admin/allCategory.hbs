@@ -12,12 +12,18 @@
                 <input class="form-control" type="text" name="name" id="name" placeholder="Enter category" value="{{result.name}}" required>
             </div>
             {{#if edit}}
-            <div class="col-auto">
-                <button type="submit" class="btn btn-warning">Edit</button>
+            <div class="d-flex col-auto">
+                <button type="submit" class="btn btn-warning icon">
+                    <i class="fa-regular fa-pen-to-square"></i>
+                </button>
                 <a class="btn btn-link link-secondary" href="/admin/category">or Create New</a>
             </div>
             {{else}}
-            <div class="col-auto"><button type="submit" class="btn btn-success">Create</button></div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-success icon">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
             {{/if}}
         </div>
     </form>
@@ -38,14 +44,20 @@
             <th scope="row">{{this.id}}</th>
             <td>{{this.name}}</td>
             <td>
-            <button type="button" class="btn btn-link">
-                <a class="btn btn-link link-primary" href="/admin/category/{{this.id}}">
-                    Edit
-                </a>
-            </button>
-            <form action="/admin/category/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
-                <button type="submit" class="btn btn-link link-danger" onclick="return confirm(`確定要刪除 {{ this.name }} 嗎？`)">Delete</button>
-            </form>
+                <div class="d-flex col-auto">
+                    <button type="button" class="btn btn-link">
+                        <a class="btn btn-link link-primary" href="/admin/category/{{this.id}}">
+                            Edit
+                        </a>
+                    </button>
+                    <div class="d-flex align-items-center">
+                        <form action="/admin/category/{{this.id}}?_method=DELETE" method="POST">
+                            <button type="submit" class="btn btn-link link-danger" onclick="return confirm(`確定要刪除 {{ this.name }} 嗎？`)">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </td>
         </tr>
         {{/each}}

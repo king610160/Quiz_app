@@ -48,7 +48,8 @@
           </th>
           <th scope="row">
               <div class="d-flex flex-row t-25">
-                <form action="/quiz/{{this.id}}?_method=DELETE" method="POST" class="me-3">
+                <form action="/plan/{{this.id}}?_method=DELETE" method="POST" class="me-3">
+                    <input class="w-100 planId disnone" type="number" name="planId" placeholder="planId" value="{{../plan.id}}">
                     <button type="submit" class="btn btn-danger">Delete Quiz</button>
                 </form>
               </div>

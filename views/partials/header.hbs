@@ -9,9 +9,6 @@
                 <li class="nav-item mx-3 left-nav">
                     <a class="nav-link" href="/plan">Plan</a>
                 </li>
-                {{!-- <li class="nav-item mx-3 left-nav">
-                    <a class="nav-link" href="/test">Test</a>
-                </li> --}}
                 <li class="nav-item mx-3 left-nav">
                     <a class="nav-link" href="/quiz">Quiz</a>
                 </li>
@@ -30,7 +27,7 @@
 
         {{!-- right : For user login/register, after login become logout and personnel profile... --}}
         <div class="d-flex align-items-center navbar-end">
-            <ul class="navbar-nav align-items-center mx-2">
+            <ul class="navbar-nav align-items-center right-0">
                 {{#if user}}
                     {{#if user.isAdmin}}
                         <li class="nav-item mx-2">
@@ -40,6 +37,9 @@
                     <li class="nav-item mx-2">
                         <a class="nav-link" href="/users/logout">Logout</a>
                     </li>
+                    <li class="nav-item mx-2">
+                        <a class="nav-link opacity-0" href="">Invisible!</a>
+                    </li>
                 {{else}}
                     <li class="nav-item mx-2">
                         <a class="nav-link" href="/users/login">Login</a>
@@ -47,19 +47,17 @@
                     <li class="nav-item mx-2">
                         <a class="nav-link" href="/users/register">Register</a>
                     </li>
-                {{/if}}
-                
-                {{!-- Here will be user headshot --}}
-                {{#if user}}
-                    <li class="nav-item mx-2">
-                        <a data-bs-toggle="offcanvas" href="#offcanvasExample" aria-controls="offcanvasExample">
-                            <img src="/image/girl.jpeg" alt="headshot" class="navheadshot">
-                        </a>
-                    </li>
+
                 {{/if}}
             </ul>
         </div>
-
     </div>
-                        
+    {{!-- Here will be user headshot --}}       
 </nav>
+{{#if user}}
+    <div class="position-absolute head_shot_absolute">
+        <a data-bs-toggle="offcanvas" href="#offcanvasExample" aria-controls="offcanvasExample">
+            <img src="/image/girl.jpeg" alt="headshot" class="navheadshot">
+        </a>
+    </div>
+{{/if}}  

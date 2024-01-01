@@ -76,8 +76,15 @@ const quizController = {
             res.render('quiz/plan/singlePlan', data)
         })
     },
-    quizAddToCollection: (req, res, next) => {
-        quizService.quizAddToCollection(req, (err) => {
+    singlePlanDeleteQuiz: (req, res, next) => {
+        quizService.singlePlanDeleteQuiz(req, (err, data) => {
+            if(err) return  next(err)
+            console.log(data)
+            res.redirect(`/plan/${data.planId}`)
+        })
+    },
+    quizAddToPlan: (req, res, next) => {
+        quizService.quizAddToPlan(req, (err) => {
             if(err) return next(err)
             res.redirect('back')
         })
