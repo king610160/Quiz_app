@@ -22,9 +22,8 @@ const quizService = {
             e[`${e.answer}true`] = true
         })
 
-        let data = toPackage('success', undefined)
-        data = {
-            ...data,
+        let data = {
+            ...toPackage('success', 'quiz'),
             quiz: quiz,
         }
         return cb(null, data)
@@ -223,10 +222,43 @@ const quizService = {
         plan = plan.toJSON()
         plan.PlanCollectToQuiz[0]['first'] = true
         const result = {
-            quiz : plan.PlanCollectToQuiz
+            quiz : plan.PlanCollectToQuiz,
+            plan: {
+                id: plan.id
+            }
         }
         return cb(null, result)
     },
+    postTest: async (req, cb) => {
+        let data = req.body
+        const planId = req.params.id
+        let plan = await Plan.findByPk(planId, {
+            include: [{
+              model: Quiz,
+              as: 'PlanCollectToQuiz',
+              attributes:['id','question','select1','select2','select3','select4','answer']
+            }],
+        })
+        plan = plan.toJSON()
+        let arr = []
+        for (let i in data) {
+            arr[Number(i.slice(0,1)) - 1] = i.slice(-7)
+        }
+        let check = plan.PlanCollectToQuiz
+        let l = check.length
+        let count = 0
+
+        for (let i = 0; i < l; i++) {
+            let realAnswer = check[i].answer
+            let userAnswer = arr[i]
+            if (realAnswer === userAnswer) {
+                count++
+            }
+        }
+        let score = count * 100 / l
+        req.flash('success_msg',`Test Plan(${plan.name}), Total score: ${score.toFixed(2)}`)
+        return cb(null)
+    }
 }
 
 module.exports = quizService

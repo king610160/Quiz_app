@@ -1,39 +1,9 @@
 {{#if status}}
 {{!-- may put something when there is no searching result --}}
-    
 {{else}}
     {{!-- Give some latest update plan or quiz --}}
     <h1>Make your first searching and start learning~</h1>
 {{/if}}
-
-
-
-
-{{#if plan}}
-    <div class="d-flex justify-content-start w-100">
-        <h3 class="mx-3">Plan</h3>
-    </div>
-    <div class="d-flex flex-row flex-wrap justify-content-start w-100">
-    {{#each plan}}
-        <div class="card p-2 m-3" style="width: 18rem;">
-            <div class="card-body">
-                <h3 class="card-title">{{this.name}}</h5>
-                <br>
-                <br>
-                <div class="d-flex justify-content-end">
-                    <a href="/plan/{{this.id}}" class="btn btn-primary mx-1">Check</a>
-                    <a href="#" class="btn btn-primary mx-1">Test</a>
-                </div>
-            </div>
-        </div>
-    {{/each}}
-    </div>
-    <br>
-    <hr class="border border-2 border-dark w-100">
-    <br>
-{{/if}}
-
-
 
 {{#if quiz}}
     <div class="d-flex justify-content-start w-100 mb-3">
@@ -41,7 +11,7 @@
     </div>
     <div class="w-100 p-3">
         {{#each quiz}}
-        <div class="card d-flex flex-row w-100 justify-content-between" style="width: 18rem;">
+        <div class="card d-flex flex-row w-100 m-3 justify-content-between" style="width: 18rem;">
             <div class="card-body d-flex flex-column">
                 <p class="d-inline-flex gap-1">
                 <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample{{this.id}}" role="button" aria-expanded="false" aria-controls="collapseExample">

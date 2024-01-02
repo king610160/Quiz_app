@@ -32,7 +32,24 @@
         </div>
         <div class="offcanvas-body">
             <div>
-                May show some exp, or todo-list here?
+               <div class="col-auto mx-3">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{#if user.Plan}}
+                                Default Folder : {{user.Plan.name}}
+                            {{else}}
+                                Dropdown button
+                            {{/if}}
+                        </button>
+                        <ul class="dropdown-menu">
+                            {{#each plan}}
+                            <form action="/plan/defaultFolder/{{this.id}}" method="POST">
+                                <li><button class="dropdown-item" type="submit">{{this.name}}</button></li>
+                            </form>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
