@@ -62,3 +62,14 @@
 .disnone {
     display: none;
 }
+
+.carousel-inner {
+    height: 480px;
+}
+
+.carousel-item {
+    width: 68%;
+    margin: auto;
+    top: 16%;
+    left: 16%;
+}

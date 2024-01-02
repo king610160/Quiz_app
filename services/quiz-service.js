@@ -193,20 +193,40 @@ const quizService = {
     quizAddToPlan: async (req, cb) => {
         const quizId = req.params.id
         const planId = req.user.planId
+        const userId = req.user.id
         const find = await Collection.findOne({
             where:{
                 quizId,
-                planId
+                planId,
+                userId
             }
         })
         if (find) return cb(new Error('Already collect it in the default folder.'))
         const result = await Collection.create({
             quizId,
-            planId
+            planId,
+            userId
         })
         if(!result) throw new Error('Update fail')
         return cb(null)
-    }
+    },
+    test: async (req, cb) => {
+        const planId = req.params.id
+
+        let plan = await Plan.findByPk(planId, {
+            include: [{
+              model: Quiz,
+              as: 'PlanCollectToQuiz',
+              attributes:['id','question','select1','select2','select3','select4','answer']
+            }],
+        })
+        plan = plan.toJSON()
+        plan.PlanCollectToQuiz[0]['first'] = true
+        const result = {
+            quiz : plan.PlanCollectToQuiz
+        }
+        return cb(null, result)
+    },
 }
 
 module.exports = quizService

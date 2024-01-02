@@ -4,12 +4,12 @@ const router = express.Router()
 const quizController = require('../../../controller/pages/quiz-controller')
 
 // test : select what plan want to test
-router.get('/test', quizController.testSelect)
+router.get('/test/:id', quizController.test)
+router.post('/test/:id', quizController.postTest)
 // router.get('/test')
 
 // plan, make plan
 router.post('/plan/defaultFolder/:id', quizController.changeDefaultFolder)
-// not finish delete function
 router.delete('/plan/:id', quizController.singlePlanDeleteQuiz)
 router.get('/plan/:id', quizController.singlePlanPage)
 router.get('/plan', quizController.planPage)

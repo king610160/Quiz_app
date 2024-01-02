@@ -15,7 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   Collection.init({
     planId: DataTypes.INTEGER,
-    quizId: DataTypes.INTEGER
+    quizId: DataTypes.INTEGER,
+    userId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Collection',

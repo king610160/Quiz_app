@@ -48,8 +48,15 @@ const quizController = {
             res.redirect('/quiz')
         })
     },
-    testSelect: (req, res) => {
-        res.render('quiz/test/testSelect')
+    test: (req, res, next) => {
+        quizService.test(req, (err, data) => {
+            if(err) next(err)
+            res.render('quiz/test/test', data)
+        })
+    },
+    postTest: (req, res) => {
+        console.log(req.body)
+        res.redirect('/home')
     },
     planPage: (req, res, next) => {
         quizService.planPage(req, (err, data) => {
