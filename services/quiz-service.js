@@ -1,4 +1,4 @@
-const { User, Quiz, Plan, Collection } = require('../models')
+const { User, Quiz, Plan, Collection, Score } = require('../models')
 const { Sequelize } = require('sequelize')
 const { toPackage } = require('../helper/api-helper')
 
@@ -219,7 +219,10 @@ const quizService = {
               attributes:['id','question','select1','select2','select3','select4','answer']
             }],
         })
+        
+        if (!plan.PlanCollectToQuiz.length) return cb(new Error('There is no quiz in this plan.'))
         plan = plan.toJSON()
+        console.log(plan)
         plan.PlanCollectToQuiz[0]['first'] = true
         const result = {
             quiz : plan.PlanCollectToQuiz,
@@ -232,6 +235,7 @@ const quizService = {
     postTest: async (req, cb) => {
         let data = req.body
         const planId = req.params.id
+        const userId = req.user.id
         let plan = await Plan.findByPk(planId, {
             include: [{
               model: Quiz,
@@ -239,6 +243,7 @@ const quizService = {
               attributes:['id','question','select1','select2','select3','select4','answer']
             }],
         })
+        if (!plan) return cb(new Error('There is no this plan.'))
         plan = plan.toJSON()
         let arr = []
         for (let i in data) {
@@ -256,8 +261,35 @@ const quizService = {
             }
         }
         let score = count * 100 / l
-        req.flash('success_msg',`Test Plan(${plan.name}), Total score: ${score.toFixed(2)}`)
-        return cb(null)
+        score = Number(score.toFixed(2))
+
+        const result = await Score.create({
+            score,
+            planId,
+            userId
+        })
+
+        req.flash('success_msg',`Test Plan (${plan.name}) , Total score: ${score.toFixed(2)}`)
+        return cb(null, result)
+    },
+    resultPage: async (req, cb) => {
+        const userId = req.user.id
+        let result = await Score.findAll({
+            where:{
+                userId
+            },
+            include: [{
+                model: Plan,
+                attributes: ['id','name']
+            }],
+            raw: true,
+            nest: true
+        }) 
+
+        let score = {
+            score: result
+        }
+        return cb(null, score)
     }
 }
 

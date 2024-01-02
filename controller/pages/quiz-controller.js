@@ -56,14 +56,14 @@ const quizController = {
     // go to test page for test
     test: (req, res, next) => {
         quizService.test(req, (err, data) => {
-            if(err) next(err)
+            if(err) return next(err)
             res.render('quiz/test/test', data)
         })
     },
     // post test result
     postTest: (req, res, next) => {
         quizService.postTest(req, (err) => {
-            if(err) next(err)
+            if(err) return next(err)
             res.redirect('/home')
         })
         
@@ -109,6 +109,12 @@ const quizController = {
         quizService.quizAddToPlan(req, (err) => {
             if(err) return next(err)
             res.redirect('back')
+        })
+    },
+    resultPage: (req, res, next) => {
+        quizService.resultPage(req, (err, data) => {
+            if(err) next(err)
+            res.render('quiz/result/result', data)
         })
     }
 }

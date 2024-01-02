@@ -14,7 +14,8 @@ module.exports = (sequelize, DataTypes) => {
         through: models.Collection, // through collection to make contact
         foreignKey: 'planId', // set foreign key
         as: 'PlanCollectToQuiz' // name this relation
-      })
+      }),
+      Plan.hasMany(models.Score, {foreignKey: 'planId'})
     }
   }
   Plan.init({

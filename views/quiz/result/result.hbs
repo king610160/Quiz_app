@@ -1,0 +1,16 @@
+<div class="d-flex flex-column justify-content-start w-100">
+    <h1>Score page</h1>
+    {{#each score}}
+        <div class="card d-flex flex-column w-100 border-dark m-3 p-1">
+            <div class="card-body d-flex flex-row justify-content-between">
+                <div>
+                    <div>Test : {{this.Plan.name}}</div>
+                </div>
+                <div class="score-time d-flex flex-rows justify-content-between">
+                    <div>Time : {{relativeTimeFromNow this.createdAt}}</div>
+                    <div>Score : {{this.score}}</div>
+                </div>
+            </div>
+        </div>
+    {{/each}}
+</div>

@@ -6,7 +6,9 @@ const quizController = require('../../../controller/pages/quiz-controller')
 // test : select what plan want to test
 router.get('/test/:id', quizController.test)
 router.post('/test/:id', quizController.postTest)
-// router.get('/test')
+
+// result : check test result
+router.get('/result', quizController.resultPage)
 
 // plan, make plan
 router.post('/plan/defaultFolder/:id', quizController.changeDefaultFolder)
