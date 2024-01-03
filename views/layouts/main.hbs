@@ -49,7 +49,7 @@ use warning for test? --}}
                             {{/if}}
                         </button>
                         <ul class="dropdown-menu">
-                            {{#each plan}}
+                            {{#each user.plan}}
                             <form action="/plan/defaultFolder/{{this.id}}" method="POST">
                                 <li><button class="dropdown-item" type="submit">{{this.name}}</button></li>
                             </form>

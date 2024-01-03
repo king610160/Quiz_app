@@ -4,38 +4,116 @@ const quizController = {
     // still lack edit function for api
     home: (req, res, next) => {
         quizService.home(req, (err, data) => {
-            if (err) next(err)
+            if (err) return next(err)
+            if (data.setting) delete data.setting
             res.json({
-                status:'success',
-                data: data
+                data
+            })
+        })
+    },
+    quizPage: (req, res, next) => {
+        quizService.quizPage(req, (err, data) => {
+            if (err) return next(err)
+            res.json({
+                data
             })
         })
     },
     postQuiz: (req, res, next) => {
         quizService.postQuiz(req, (err, data) =>{
-            if (err) next(err)
+            if (err) return next(err)
             res.json({
-                status:'success',
                 data
             })
         })
     },
     editQuizPage : (req, res, next) => {
         quizService.editQuizPage(req, (err, data) => {
-            if(err) next(err)
+            if(err) return next(err)
             res.json({
-                status: 'success',
                 data
             })
         })
+    },
+    editQuiz: (req, res, next) => {
+        quizService.editQuiz(req, (err, data) => {
+            if (err) return next(err)
+            res.json({
+                data
+            })
+        })
+
     },
     deleteQuiz: (req, res, next) => {
         quizService.deleteQuiz(req, (err, data) => {
             if(err) next(err)
             res.json({
-                status: 'success',
                 data
             })
+        })
+    },
+    test: (req, res, next) => {
+        quizService.test(req, (err, data) => {
+            if(err) return next(err)
+            res.json(data)
+        })
+    },
+    postTest: (req, res, next) => {
+        quizService.postTest(req, (err, data) => {
+            if(err) return next(err)
+            res.json(data)
+        })
+    },
+    planPage: (req, res, next) => {
+        quizService.planPage(req, (err, data) => {
+            if(err) return next(err)
+            data.user = {
+                planId: data.user.planId,
+                Plan: data.user.Plan
+            }
+            res.json(data)
+        })
+    },
+    postPlan: (req, res, next) => {
+        quizService.postPlan(req, (err, data) => {
+            if (err) return next(err)
+            res.json(data)
+        })
+    },
+    deletePlan: (req, res, next) => {
+        quizService.deletePlan(req, (err, data) => {
+            if (err) return next(err)
+            res.json(data)
+        })
+    },
+    changeDefaultFolder: (req, res, next) => {
+        quizService.changeDefaultFolder(req, (err, data) => {
+            if (err) return next(err)
+            res.json(data)
+        })
+    },
+    singlePlanPage: (req, res, next) => {
+        quizService.singlePlanPage(req, (err, data) => {
+            if(err) return next(err)
+            res.json(data)
+        })
+    },
+    singlePlanDeleteQuiz: (req, res, next) => {
+        quizService.singlePlanDeleteQuiz(req, (err, data) => {
+            if(err) return next(err)
+            res.json(data)
+        })
+    },
+    quizAddToPlan: (req, res, next) => {
+        quizService.quizAddToPlan(req, (err, data) => {
+            if(err) return next(err)
+            res.json(data)
+        })
+    },
+    resultPage: (req, res, next) => {
+        quizService.resultPage(req, (err, data) => {
+            if(err) return next(err)
+            res.json(data)
         })
     }
 }

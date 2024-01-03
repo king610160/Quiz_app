@@ -10,8 +10,9 @@ const { apiErrorHandler } = require('../../middleware/error-handler')
 
 
 router.use('/admin', authenticatedAdmin, admin)
-router.use('/quiz', authenticated, quiz)
 router.use('/users', users)
+router.use('/', authenticated, quiz)
+
 
 // go to error-handle for api
 router.use('/', apiErrorHandler)

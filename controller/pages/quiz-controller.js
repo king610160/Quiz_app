@@ -13,7 +13,7 @@ const quizController = {
     quizPage: (req, res, next) => {
         quizService.quizPage(req, (err, data) => {
             if (err) next(err)
-            res.render('quiz/quiz', {quiz: data})
+            res.render('quiz/quiz', {quiz: data.quiz})
         })
     },
     // create quiz page
@@ -82,12 +82,18 @@ const quizController = {
             res.redirect('/plan')
         })
     },
+    deletePlan: (req, res, next) => {
+        quizService.deletePlan(req, (err) => {
+            if (err) return next(err)
+            res.redirect('/plan')
+        })
+    },
     // will change the default folder for saving quiz
     changeDefaultFolder: (req, res, next) => {
         quizService.changeDefaultFolder(req, (err, data) => {
             if (err) return next(err)
-            req.flash('success_msg',`Your default folder had changed to ${data.plan.name}`)
-            res.redirect('/plan')
+            req.flash('success_msg',`Your default folder had changed to ${data.user.Plan.name}`)
+            res.redirect('back')
         })
     },
     // go to single plan page, many quiz in the plan
@@ -100,7 +106,7 @@ const quizController = {
     // delete this plan's quiz
     singlePlanDeleteQuiz: (req, res, next) => {
         quizService.singlePlanDeleteQuiz(req, (err, data) => {
-            if(err) return  next(err)
+            if(err) return next(err)
             res.redirect(`/plan/${data.planId}`)
         })
     },

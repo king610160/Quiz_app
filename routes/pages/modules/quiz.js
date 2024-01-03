@@ -10,9 +10,12 @@ router.post('/test/:id', quizController.postTest)
 // result : check test result
 router.get('/result', quizController.resultPage)
 
+// singlePlan
+router.delete('/plan/quiz/:id', quizController.singlePlanDeleteQuiz)
+
 // plan, make plan
 router.post('/plan/defaultFolder/:id', quizController.changeDefaultFolder)
-router.delete('/plan/:id', quizController.singlePlanDeleteQuiz)
+router.delete('/plan/:id', quizController.deletePlan)
 router.get('/plan/:id', quizController.singlePlanPage)
 router.get('/plan', quizController.planPage)
 router.post('/plan', quizController.postPlan)

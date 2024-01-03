@@ -2,7 +2,7 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const passportJWT = require('passport-jwt')
 const bcrypt = require('bcryptjs')
-const { User } = require('../models')
+const { User, Plan } = require('../models')
 
 const JWTStrategy = passportJWT.Strategy
 const ExtractJWT = passportJWT.ExtractJwt
@@ -19,11 +19,12 @@ passport.use(new LocalStrategy(
     async (req, email, password, cb) => {
         const user = await User.findOne({ 
             where: { email },
+            include: [{ model: Plan }],
             attributes: { include: ['password'] } 
         })
         if (!user) return cb(new Error('Email or password is not correct.'), null)          
         const compare = await bcrypt.compare(password, user.password)
-        if (!compare) return cb(new Error('Email or password is not correct.'), null) 
+        if (!compare) return cb(new Error('Email or password is not correct.'), null)
         return cb(null, user)
     }
 ))
@@ -52,8 +53,22 @@ passport.serializeUser((user, cb) => {
     cb(null, user.id)
 })
 passport.deserializeUser(async (id, cb) => {
-    let user = await User.findByPk(id)
-    user = user.toJSON()
+    let [plan, user] = await Promise.all([
+        Plan.findAll({
+            where: {
+                userId: id
+            },
+            raw: true,
+            nest: true
+        }),
+        User.findByPk(id, {
+            include: [{model: Plan}]
+        })
+    ])
+    user = {
+        ...user.toJSON(),
+        plan
+    }
     return cb(null, user)
 })
 
