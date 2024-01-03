@@ -5,13 +5,13 @@ const quizController = {
     // home may put personnel info
     home: (req, res, next) => {
         quizService.home(req, (err, data) => {
-            if(err) next(err)
+            if(err) return next(err)
             res.render('quiz/homePage', data)
         })  
     },
     // go to quiz page for checking the quiz
     quizPage: (req, res, next) => {
-        quizService.quiz(req, (err, data) => {
+        quizService.quizPage(req, (err, data) => {
             if (err) next(err)
             res.render('quiz/quiz', {quiz: data})
         })

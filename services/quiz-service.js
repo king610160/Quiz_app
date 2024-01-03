@@ -28,7 +28,7 @@ const quizService = {
         }
         return cb(null, data)
     },
-    quiz: async(req, cb) => {
+    quizPage: async(req, cb) => {
         const quiz = await Quiz.findAll({
             where: {
                 user_id: req.user.id
@@ -222,7 +222,6 @@ const quizService = {
         
         if (!plan.PlanCollectToQuiz.length) return cb(new Error('There is no quiz in this plan.'))
         plan = plan.toJSON()
-        console.log(plan)
         plan.PlanCollectToQuiz[0]['first'] = true
         const result = {
             quiz : plan.PlanCollectToQuiz,
@@ -282,6 +281,7 @@ const quizService = {
                 model: Plan,
                 attributes: ['id','name']
             }],
+            order: [['createdAt', 'DESC']],
             raw: true,
             nest: true
         }) 

@@ -8,6 +8,7 @@ const authenticated = (req, res, next) => {
 }
 const authenticatedAdmin = (req, res, next) => {
     passport.authenticate('jwt', { session: false }, (err, data) => {
+        if (!data) return res.status(403).json({ status: 'error', message: 'permission denied' })
         let userData = data.toJSON()
         if (!userData.isAdmin) return res.status(403).json({ status: 'error', message: 'permission denied' }) 
         req.user = userData

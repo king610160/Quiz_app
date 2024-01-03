@@ -9,7 +9,7 @@
                     <input class="form-control" type="text" name="name" id="name" placeholder="Enter folder name" value="" aria-describedby="nameHelp" required>
                 </div>
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-success">Create folder</button>
+                    <button type="submit" class="btn btn-primary">Create folder</button>
                 </div>
             </div>
         </form>
@@ -47,11 +47,11 @@
             <br>
             <br>
             <div class="d-flex justify-content-end">
-                <a href="/plan/{{this.id}}" class="icon btn btn-secondary mx-1">
+                <a href="/plan/{{this.id}}" class="icon btn btn-dark mx-1">
                     <i class="fa-solid fa-eye"></i>
                 </a>
-                <a href="/test/{{this.id}}" class="icon btn btn-primary mx-1">
-                    <i class="fa-regular fa-pen-to-square"></i>
+                <a href="/test/{{this.id}}" class="icon btn green-blue mx-1">
+                    <i class="fa-solid fa-play"></i>
                 </a>
                 <form action="/plan/{{this.id}}?_method=DELETE" method="DELETE">
                     <a class="icon btn btn-danger mx-1">

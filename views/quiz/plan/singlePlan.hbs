@@ -1,12 +1,13 @@
 
 <div class="w-100 mb-3">
+  {{#if plan.PlanCollectToQuiz}}
     <h1>Plan : {{plan.name}}</h1>
 </div>
 
 
 <div class="w-100">
   <table class="table align-middle">
-  <thead class="table-light">
+  <thead class="table-dark">
       <tr>
       <th scope="col">Id</th>
       <th scope="col">Question</th>
@@ -50,7 +51,9 @@
               <div class="d-flex flex-row t-25">
                 <form action="/plan/{{this.id}}?_method=DELETE" method="POST" class="me-3">
                     <input class="w-100 planId disnone" type="number" name="planId" placeholder="planId" value="{{../plan.id}}">
-                    <button type="submit" class="btn btn-danger">Delete Quiz</button>
+                    <button type="submit" class="btn btn-danger">
+                      <i class="fa-regular fa-trash"></i>
+                    </button>
                 </form>
               </div>
           </th>
@@ -58,4 +61,8 @@
       {{/each}}
   </tbody>
   </table>
+  {{else}}
+    <h1>There is nothing here, start collect your quiz to this plan.</h1>
+    {{!-- Maybe put a picture here --}}
+  {{/if}}
 </div>

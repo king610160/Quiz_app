@@ -1,6 +1,6 @@
-/* .search {
-    width: 800px;
-} */
+body {
+    background-image: linear-gradient(90deg, #f6d365 0%, #fda085 100%);
+}
 
 .search-container {
     width: 50%;
@@ -76,4 +76,21 @@
 
 .score-time{
     width:40%;
+}
+
+.green-blue{
+    background-color:#38ada9;
+    border-color: #38ada9;
+}
+.green-blue:hover{
+    background-color:#079992;
+    border-color: #079992;
+}
+
+.green-blue i.fa-solid.fa-play {
+    color: white;
+}
+
+.test-form {
+    background-image: linear-gradient(-20deg, #ddd6f3 0%, #faaca8 100%, #faaca8 100%);
 }
