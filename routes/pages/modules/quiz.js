@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const upload = require('../../../middleware/multer')
 
 const quizController = require('../../../controller/pages/quiz-controller')
 
@@ -22,6 +23,9 @@ router.post('/plan', quizController.postPlan)
 
 // homePage
 router.get('/home', quizController.home)
+router.put('/user/info/:id', upload.single('file'),quizController.putUserInfo)
+router.get('/user/info/:id', quizController.userEditPage)
+router.get('/user/info', quizController.userInfoPage)
 router.post('/user/collect/:id', quizController.quizAddToPlan)
 
 // quiz page's CURD, make quiz

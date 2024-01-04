@@ -1,7 +1,6 @@
 const quizService = require('../../services/quiz-service')
 
 const quizController = {
-    // still lack edit function for api
     home: (req, res, next) => {
         quizService.home(req, (err, data) => {
             if (err) return next(err)

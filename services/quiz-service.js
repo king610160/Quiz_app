@@ -1,6 +1,7 @@
 const { User, Quiz, Plan, Collection, Score } = require('../models')
 const { Sequelize } = require('sequelize')
 const { toPackage } = require('../helper/api-helper')
+const { localFileHandler } = require('../helper/file-helper')
 
 const quizService = {
     home: async(req, cb) => {
@@ -342,6 +343,42 @@ const quizService = {
             score: result
         }
         return cb(null, score)
+    },
+    userInfoPage: async (req, cb) => {
+        const data = {
+            ...toPackage('success'),
+            user: req.user
+        }
+        return cb(null, data)
+    },
+    userEditPage: async (req, cb) => {
+        const data = {
+            ...toPackage('success','edit'),
+            user: req.user
+        }
+        return cb(null, data)
+    },
+    putUserInfo: async (req, cb) => {
+        const { name, description } = req.body
+        const { file } = req
+        console.log(req)
+        const id = req.user.id
+        const [check, filePath] = await Promise.all([
+            User.findByPk(id),
+            localFileHandler(file)
+        ])
+        console.log('put')
+        console.log(filePath)
+        if (!check) return cb(new Error('There is no this user.'))
+        await check.update({
+            name,
+            image: filePath || check.image,
+            description
+        })
+        const result = {
+            ...toPackage('success'),
+        }
+        return cb(null, result)
     }
 }
 

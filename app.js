@@ -11,6 +11,7 @@ const passport = require('./config/passport')
 const session = require('express-session')
 const { getUser } = require('./helper/auth-helper')
 const handlebarsHelper = require('./helper/handlebars-helper')
+const path = require('path')
 
 // extra security
 // const helmet = require('helmet')
@@ -24,8 +25,8 @@ const { pages, apis } = require('./routes')
 // deal with security fisrt
 app.set('trust proxy', 1)
 const limiter = rateLimit({
-	windowMs: 1 * 60 * 1000, // 15 minutes
-	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	windowMs: 1 * 60 * 1000, // 1 minutes
+	max: 100, // Limit each IP to 100 requests per `window` (here, per 1 minutes)
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
@@ -33,8 +34,6 @@ app.use(limiter)
 // app.use(helmet())
 app.use(cors())
 app.use(xss())
-
-
 
 // set static file
 app.use(express.static('public'))
@@ -51,6 +50,9 @@ app.use(methodOverride('_method'))
 
 // flash-message
 app.use(flash())
+
+// local image storage
+app.use('/upload', express.static(path.join(__dirname, 'upload'))) 
 
 // return json
 app.use(express.json())

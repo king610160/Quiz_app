@@ -50,7 +50,7 @@ const quizController = {
         quizService.deleteQuiz (req, (err) => {
             if (err) return next(err)
             req.flash('success_msg', 'The quiz had been deleted successfully.')
-            res.redirect('/quiz')
+            res.redirect('back')
         })
     },
     // go to test page for test
@@ -117,12 +117,33 @@ const quizController = {
             res.redirect('back')
         })
     },
+    // all the test result
     resultPage: (req, res, next) => {
         quizService.resultPage(req, (err, data) => {
             if(err) next(err)
             res.render('quiz/result/result', data)
         })
+    },
+    // change user info
+    userInfoPage: (req, res, next) => {
+        quizService.userInfoPage(req, (err) => {
+            if(err) return next(err)
+            res.render('users/info')
+        })
+    },
+    userEditPage: (req, res, next) => {
+        quizService.userEditPage(req, (err, data) => {
+            if(err) return next(err)
+            res.render('users/info', data)
+        })
+    },
+    putUserInfo: (req, res, next) => {
+        quizService.putUserInfo(req, (err) => {
+            if(err) return next(err)
+            res.redirect('/user/info')
+        })
     }
+
 }
 
 module.exports = quizController
