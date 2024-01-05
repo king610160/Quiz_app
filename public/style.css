@@ -118,3 +118,7 @@ body {
 .personnel-board-content {
     left:2.5%
 }
+
+.bg-secondary {
+    background-color: #6c757d !important;
+}

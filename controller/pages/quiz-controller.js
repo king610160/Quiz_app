@@ -128,6 +128,12 @@ const quizController = {
             res.render('quiz/result/result', data)
         })
     },
+    resultSinglePage: (req, res, next) => {
+        quizService.resultSinglePage(req, (err, data) => {
+            if(err) next(err)
+            res.render('quiz/result/singleResult', data)
+        })
+    },
     // change user info
     userInfoPage: (req, res, next) => {
         quizService.userInfoPage(req, (err) => {

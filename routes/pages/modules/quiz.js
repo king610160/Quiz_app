@@ -9,7 +9,9 @@ router.get('/test/:id', quizController.test)
 router.post('/test/:id', quizController.postTest)
 
 // result : check test result
+router.get('/result/:id', quizController.resultSinglePage)
 router.get('/result', quizController.resultPage)
+
 
 // singlePlan
 router.delete('/plan/quiz/:id', quizController.singlePlanDeleteQuiz)

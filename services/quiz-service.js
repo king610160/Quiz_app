@@ -372,6 +372,41 @@ const quizService = {
         }
         return cb(null, score)
     },
+    resultSinglePage: async (req, cb) => {
+        const id = req.params.id
+        const find = await Score.findByPk(id,{
+            raw: true,
+        })
+        const quizId = find.allQuizId
+        const userAnswer = find.allUserAnswer
+        let quizArr = quizId.split(',')
+        quizArr.pop()
+        let userArr = userAnswer.split('')
+        let quiz = await Quiz.findAll({
+            where: {
+                id: {
+                    [Sequelize.Op.in]: quizArr
+                }
+            },
+            order: [
+                Sequelize.literal(`FIELD(id, ${quizArr.join(',')})`) // 使用 FIELD 函數按照指定順序排序
+            ],
+            raw: true, 
+            nest: true
+        })
+        for (let i = 0; i < quizArr.length; i++) {
+            let t = quiz[i]
+            t[`${t.answer}true`] = true
+            let user = userArr[i]
+            t[`userSelect${user}`] = true
+        }
+        let result = {
+            score: find, 
+            quiz: quiz,
+            ...toPackage('sccuess')
+        }
+        return cb(null, result)
+    },
     userInfoPage: async (req, cb) => {
         const data = {
             ...toPackage('success'),
