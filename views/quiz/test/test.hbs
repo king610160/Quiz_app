@@ -5,30 +5,38 @@
         <div class="carousel-item w-100 {{#if this.first}}active{{/if}}">
           <div class="d-block">
             <p>{{inc @index}}.  {{this.question}}</p>
+            {{#if this.select1}}
             <div>
               <label>
-                <input type="radio" name="{{inc @index}}_select1" value={{this.select2}}>
+                <input type="radio" name="{{inc @index}}" value='select1'>
                 {{this.select1}}
               </label>
             </div>
+            {{/if}}
+            {{#if this.select2}}
             <div>
               <label>
-                <input type="radio" name="{{inc @index}}_select2" value={{this.select2}}>
+                <input type="radio" name="{{inc @index}}" value='select2'>
                 {{this.select2}}
               </label>
             </div>
+            {{/if}}
+            {{#if this.select3}}
             <div>
               <label>
-                <input type="radio" name="{{inc @index}}_select3" value={{this.select3}}>
+                <input type="radio" name="{{inc @index}}" value='select3'>
                 {{this.select3}}
               </label>
             </div>
+            {{/if}}
+            {{#if this.select4}}
             <div>
               <label>
-                <input type="radio" name="{{inc @index}}_select4" value={{this.select4}}>
+                <input type="radio" name="{{inc @index}}" value='select4'>
                 {{this.select4}}
               </label>
             </div>
+            {{/if}}
           </div>
         </div>
       {{/each}}

@@ -107,6 +107,10 @@ const quizController = {
     singlePlanDeleteQuiz: (req, res, next) => {
         quizService.singlePlanDeleteQuiz(req, (err, data) => {
             if(err) return next(err)
+            if (!data.quizLength) {
+                req.flash('warning_msg','There is no quiz in the plan now.')
+                return res.redirect('/plan')
+            }
             res.redirect(`/plan/${data.planId}`)
         })
     },
@@ -143,7 +147,6 @@ const quizController = {
             res.redirect('/user/info')
         })
     }
-
 }
 
 module.exports = quizController

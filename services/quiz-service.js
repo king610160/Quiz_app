@@ -1,7 +1,7 @@
 const { User, Quiz, Plan, Collection, Score } = require('../models')
 const { Sequelize } = require('sequelize')
 const { toPackage } = require('../helper/api-helper')
-const { localFileHandler } = require('../helper/file-helper')
+const { imgurFileHandler } = require('../helper/file-helper')
 
 const quizService = {
     home: async(req, cb) => {
@@ -94,11 +94,11 @@ const quizService = {
     editQuiz: async (req, cb) => {
         let { question, select1, select2, select3, select4, answer } = req.body
         let id = req.params.id
-        if (!question || !select1) throw new Error('Please fill question and at least an option.')
-        if (answer === '0') throw new Error('Please select the answer')
+        if (!question || !select1) return cb(new Error('Please fill question and at least an option.'))
+        if (answer === '0') return cb(new Error('Please select the answer'))
 
         const quiz = await Quiz.findByPk(id)
-        if (!quiz) throw new Error('There is no that quiz existed.')
+        if (!quiz) return cb(new Error('There is no that quiz existed.'))
         let update = await quiz.update({
             question,
             select1,
@@ -117,7 +117,7 @@ const quizService = {
     deleteQuiz: async (req, cb) => {
         let id = req.params.id
         const quiz = await Quiz.findByPk(id)
-        if (!quiz) throw new Error('There is no that quiz existed.')
+        if (!quiz) return cb(new Error('There is no that quiz existed.'))
         await quiz.destroy()
         const result = {
             ...toPackage('success'),
@@ -216,17 +216,28 @@ const quizService = {
     singlePlanDeleteQuiz: async (req, cb) => {
         const quizId = req.params.id
         const planId = req.body.planId
-        const find = await Collection.findOne({
-            where:{
-                quizId,
-                planId
-            }
-        })
-        if(!find) return cb(new Error('There is no this quiz in the plan'))
+        const [find, findAll]= await Promise.all([
+            Collection.findOne({
+                where:{
+                    quizId,
+                    planId
+                }
+            }),
+            Collection.findAll({
+                where:{
+                    planId,
+                    userId: req.user.id
+                },
+                raw: true
+            }),
+        ])
+        
+        if (!find) return cb(new Error('There is no quiz in the plan'))
         find.destroy()
         let result = {
             ...toPackage('success'),
-            quiz: find,
+            quiz: find.toJSON(),
+            quizLength: findAll.length - 1,
             planId
         }
         return cb(null, result)
@@ -268,7 +279,13 @@ const quizService = {
         if (!plan.PlanCollectToQuiz.length) return cb(new Error('There is no quiz in this plan.'))
         plan = plan.toJSON()
         plan.PlanCollectToQuiz[0]['first'] = true
-        plan.PlanCollectToQuiz.map((e) => delete e.Collection)
+        plan.PlanCollectToQuiz.map((e) => {
+            delete e.Collection
+            if (!e.select1.trim()) delete e.select1
+            if (!e.select2.trim()) delete e.select2
+            if (!e.select3.trim()) delete e.select3
+            if (!e.select4.trim()) delete e.select4
+        })
         const result = {
             ...toPackage('success'),
             quiz : plan.PlanCollectToQuiz,
@@ -276,10 +293,10 @@ const quizService = {
                 id: plan.id
             }
         }
+        console.log(result)
         return cb(null, result)
     },
     postTest: async (req, cb) => {
-        // need to fix the redio button for radio class name are not the same
         let data = req.body
         const planId = req.params.id
         const userId = req.user.id
@@ -293,9 +310,7 @@ const quizService = {
         if (!plan) return cb(new Error('There is no this plan.'))
         plan = plan.toJSON()
         let arr = []
-        for (let i in data) {
-            arr[Number(i.slice(0,1)) - 1] = i.slice(-7)
-        }
+        for (let i in data) arr[Number(i) - 1] = data[i]
         let check = plan.PlanCollectToQuiz
         let l = check.length
         let count = 0
@@ -309,7 +324,6 @@ const quizService = {
         }
         let score = count * 100 / l
         score = Number(score.toFixed(2))
-
         let result = await Score.create({
             score,
             planId,
@@ -361,19 +375,16 @@ const quizService = {
     putUserInfo: async (req, cb) => {
         const { name, description } = req.body
         const { file } = req
-        console.log(req)
         const id = req.user.id
         const [check, filePath] = await Promise.all([
             User.findByPk(id),
-            localFileHandler(file)
+            imgurFileHandler(file)
         ])
-        console.log('put')
-        console.log(filePath)
         if (!check) return cb(new Error('There is no this user.'))
         await check.update({
-            name,
+            name: name || check.name,
             image: filePath || check.image,
-            description
+            description: description || check.description
         })
         const result = {
             ...toPackage('success'),
