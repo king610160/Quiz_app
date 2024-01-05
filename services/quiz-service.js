@@ -293,7 +293,6 @@ const quizService = {
                 id: plan.id
             }
         }
-        console.log(result)
         return cb(null, result)
     },
     postTest: async (req, cb) => {
@@ -314,20 +313,35 @@ const quizService = {
         let check = plan.PlanCollectToQuiz
         let l = check.length
         let count = 0
-
+        // ansStr is all the quiz real answer
+        // inputStr is user's all quiz's input
+        // allQuizId is all the quiz's id
+        // correct is to record the quiz is correct or not
+        let allQuizAnswer = ''
+        let allUserAnswer = ''
+        let allQuizId = ''
+        let correct = ''
         for (let i = 0; i < l; i++) {
             let realAnswer = check[i].answer
+            let rl = realAnswer.length - 1
             let userAnswer = arr[i]
-            if (realAnswer === userAnswer) {
-                count++
-            }
+            let ul = userAnswer?.length - 1
+            if (realAnswer === userAnswer) count++
+            correct += (realAnswer === userAnswer) ? '1' : '0'
+            allQuizAnswer += check[i].answer[rl]
+            allUserAnswer += arr[i] ? arr[i][ul] : '0'
+            allQuizId += `${check[i].id},`
         }
         let score = count * 100 / l
         score = Number(score.toFixed(2))
         let result = await Score.create({
             score,
             planId,
-            userId
+            userId,
+            allQuizAnswer,
+            allUserAnswer,
+            allQuizId,
+            correct
         })
         result = {
             ...toPackage('success'),

@@ -12,7 +12,11 @@ module.exports = (sequelize, DataTypes) => {
   Score.init({
     score: DataTypes.FLOAT,
     planId: DataTypes.INTEGER,
-    userId: DataTypes.INTEGER
+    userId: DataTypes.INTEGER,
+    allQuizAnswer: DataTypes.STRING,
+    allUserAnswer: DataTypes.STRING,
+    allQuizId: DataTypes.STRING,
+    correct: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Score',
