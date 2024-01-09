@@ -11,11 +11,14 @@ const config = require( __dirname + '/../config/config.js' )[ env ]
 const db = {}
 let sequelize
 
-// if process.env has DATABASE_URL, thenuse it as sequelize, else use config's parameter
+// if process.env has DATABASE_URL, then use it as sequelize, else use config's parameter
 if (process.env.DATABASE_URL) {
-    sequelize = new Sequelize(process.env.DATABASE_URL)
+    sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+        host: process.env.DATABASE_URL,
+        dialect: 'postgres'
+    })
 } else {
-    sequelize = new Sequelize(config)
+  sequelize = new Sequelize(config)
 }
 
 fs
