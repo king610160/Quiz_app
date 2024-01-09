@@ -18,7 +18,7 @@ const userController = {
     register: async (req, res, next) => {
         userService.register(req, (err, data) => {
             if (err) return next(err)
-            delete data.data.password
+            if (data.user) delete data.user.password
             res.redirect('/users/login')
         })
     },

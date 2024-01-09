@@ -15,7 +15,11 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     isAdmin: DataTypes.BOOLEAN,
     planId: DataTypes.INTEGER,
-    image: DataTypes.STRING,
+    image: {
+      type: DataTypes.STRING,
+      // default user headshot
+      defaultValue: 'https://i.imgur.com/U8FYM4m.jpeg'
+    },
     description: DataTypes.STRING,
   }, {
     sequelize,
