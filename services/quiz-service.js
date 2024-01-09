@@ -389,16 +389,28 @@ const quizService = {
                 }
             },
             order: [
-                Sequelize.literal(`FIELD(id, ${quizArr.join(',')})`) // 使用 FIELD 函數按照指定順序排序
+                Sequelize.literal(`ARRAY_POSITION(ARRAY[${quizArr.join(',')}], id)`)
+                // Sequelize.literal(`FIELD(id, ${quizArr.join(',')})`) // 使用 FIELD 函數按照指定順序排序
             ],
             raw: true, 
             nest: true
         })
-        for (let i = 0; i < quizArr.length; i++) {
-            let t = quiz[i]
-            t[`${t.answer}true`] = true
-            let user = userArr[i]
-            t[`userSelect${user}`] = true
+        let back = quiz.length - 1
+        for (let i = quizArr.length - 1; i >= 0; i--) {
+            let t = quiz[back]
+            if (Number(quizArr[i]) === t?.id) {
+                t[`${t.answer}true`] = true
+                let user = userArr[i]
+                t[`userSelect${user}`] = true
+                ;[quiz[back],quiz[i]] = [{}, t]
+                back--
+            } else {
+                quiz[i] = {
+                    id: i - 1,
+                    'notSelect' : true
+                }
+            }
+            
         }
         let result = {
             score: find, 
@@ -429,7 +441,6 @@ const quizService = {
             User.findByPk(id),
             imgurFileHandler(file)
         ])
-        if (!check) return cb(new Error('There is no this user.'))
         await check.update({
             name: name || check.name,
             image: filePath || check.image,

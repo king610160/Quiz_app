@@ -25,7 +25,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       answer: {
-        type: Sequelize.TINYINT
+        type: Sequelize.SMALLINT
       },
       is_delete: {
         type: Sequelize.BOOLEAN
