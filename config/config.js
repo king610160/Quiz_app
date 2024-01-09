@@ -1,5 +1,6 @@
 require('dotenv').config()
 
+// need to change back when upload
 module.exports = {
     development: {
         username: process.env.DB_USER,
