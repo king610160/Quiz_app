@@ -21,7 +21,9 @@ module.exports = (sequelize, DataTypes) => {
     select3: DataTypes.STRING,
     select4: DataTypes.STRING,
     answer: DataTypes.NUMBER,
-    isDelete: DataTypes.BOOLEAN
+    isDelete: DataTypes.BOOLEAN,
+    userId: DataTypes.INTEGER,
+    categoryId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Quiz',
