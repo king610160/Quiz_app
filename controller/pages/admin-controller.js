@@ -12,7 +12,7 @@ const adminController = {
     deleteUser: (req, res, next) => {
         adminService.deleteUser(req, (err, data) => {
             if (err) return next(err)
-            req.flash('warning_msg',`You have delete ${data.name}'s account`)
+            req.flash('warning_msg',`You have delete ${data.user.name}'s account`)
             res.redirect('/admin/users')
         })
     },

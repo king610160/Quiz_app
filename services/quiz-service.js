@@ -2,6 +2,8 @@ const { User, Quiz, Plan, Collection, Score } = require('../models')
 const { Sequelize } = require('sequelize')
 const { toPackage } = require('../helper/api-helper')
 const { imgurFileHandler } = require('../helper/file-helper')
+const { samePerson } = require('../helper/same-person-helper')
+const { NoPermissionError, NotFoundError, BadRequestError } = require('../middleware/errors')
 
 const quizService = {
     home: async(req, cb) => {
@@ -24,7 +26,7 @@ const quizService = {
             raw: true,
             nest: true
         })
-        if (!quiz.length) return cb(new Error('There is no any result.'))
+        if (!quiz.length) return cb(new NotFoundError('There is no any result.'))
         quiz.forEach((e) => {
             e[`${e.answer}true`] = true
         })
@@ -55,8 +57,8 @@ const quizService = {
     },
     postQuiz: async (req, cb) => {
         let { question, select1, select2, select3, select4, answer } = req.body
-        if (!question || !select1) return cb(new Error('Please fill question and at least an option.'))
-        if (answer === '0') return cb(new Error('Please select the answer'))
+        if (!question || !select1) return cb(new BadRequestError('Please fill question and at least an option.'))
+        if (answer === '0') return cb(new BadRequestError('Please select the answer'))
         const quiz = await Quiz.create({
             question,
             select1,
@@ -77,7 +79,8 @@ const quizService = {
     editQuizPage: async (req, cb) => {
         let id = req.params.id
         let quiz = await Quiz.findByPk(id)
-        if (!quiz) return cb(new Error('There is no that quiz existed.'))
+        if (!quiz) return cb(new NotFoundError('There is no that quiz existed.'))
+        if (!samePerson(quiz.dataValues.userId, req.user.id)) return cb(new NoPermissionError(`You cannot edit other user's quiz.`))
         quiz = quiz.toJSON()
         let data = {
             ...toPackage('success'),
@@ -94,11 +97,12 @@ const quizService = {
     editQuiz: async (req, cb) => {
         let { question, select1, select2, select3, select4, answer } = req.body
         let id = req.params.id
-        if (!question || !select1) return cb(new Error('Please fill question and at least an option.'))
-        if (answer === '0') return cb(new Error('Please select the answer'))
+        if (!question || !select1) return cb(new BadRequestError('Please fill question and at least an option.'))
+        if (answer === '0') return cb(new BadRequestError('Please select the answer'))
 
         const quiz = await Quiz.findByPk(id)
-        if (!quiz) return cb(new Error('There is no that quiz existed.'))
+        if (!samePerson(quiz.dataValues.userId, req.user.id)) return cb(new NoPermissionError(`You cannot edit other user's quiz.`))
+        if (!quiz) return cb(new NotFoundError('There is no that quiz existed.'))
         let update = await quiz.update({
             question,
             select1,
@@ -117,7 +121,8 @@ const quizService = {
     deleteQuiz: async (req, cb) => {
         let id = req.params.id
         const quiz = await Quiz.findByPk(id)
-        if (!quiz) return cb(new Error('There is no that quiz existed.'))
+        if (!samePerson(quiz.dataValues.userId, req.user.id)) return cb(new NoPermissionError(`You cannot delete other user's quiz`))
+        if (!quiz) return cb(new NotFoundError('There is no that quiz existed.'))
         await quiz.destroy()
         const result = {
             ...toPackage('success'),
@@ -164,7 +169,8 @@ const quizService = {
     deletePlan: async (req, cb) => {
         const id = req.params.id
         let plan = await Plan.findByPk(id)
-        if(!plan) return cb(new Error('There is no this plan in the database.'))
+        if (!plan) return cb(new NotFoundError('There is no this plan in the database.'))
+        if (!samePerson(plan.dataValues.userId, req.user.id)) return cb(new NoPermissionError(`You can not delete other user's plan.`))
         await plan.destroy()
         const result = {
             ...toPackage('success'),
@@ -176,7 +182,7 @@ const quizService = {
         const userId = req.user.id
         const id = req.params.id
         const check = await User.findByPk(userId)
-        if(!check) return cb(new Error('There is no this plan.'))
+        if(!check) return cb(new NotFoundError('There is no this plan.'))
         await check.update({
             planId: id
         })
@@ -198,10 +204,11 @@ const quizService = {
               model: Quiz,
               as: 'PlanCollectToQuiz',
             }],
-        })
-        if (!plan) return cb(new Error('There is no this plan existed.'))
+        })        
+        if (!plan) return cb(new NotFoundError('There is no this plan existed.'))
+        if (!samePerson(plan.dataValues.userId, req.user.id)) return cb(new NoPermissionError(`You cannot check other's plan.`))
         let deal =  plan.toJSON()
-        if (!deal.PlanCollectToQuiz.length) return cb(new Error('There is no quiz in this plan.'))
+        if (!deal.PlanCollectToQuiz.length) return cb(new NotFoundError('There is no quiz in this plan.'))
         for (let i of deal.PlanCollectToQuiz) {
             delete i.Collection
             const check = i.answer
@@ -232,7 +239,7 @@ const quizService = {
             }),
         ])
         
-        if (!find) return cb(new Error('There is no quiz in the plan'))
+        if (!find) return cb(new NotFoundError('There is no quiz in the plan'))
         find.destroy()
         let result = {
             ...toPackage('success'),
@@ -253,7 +260,7 @@ const quizService = {
                 userId
             }
         })
-        if (find) return cb(new Error('Already collect it in the default folder.'))
+        if (find) return cb(new NoPermissionError('Already collect it in the default folder.'))
         const create = await Collection.create({
             quizId,
             planId,
@@ -275,8 +282,8 @@ const quizService = {
               attributes:['id','question','select1','select2','select3','select4','answer']
             }],
         })
-        
-        if (!plan.PlanCollectToQuiz.length) return cb(new Error('There is no quiz in this plan.'))
+        if(!samePerson(plan.dataValues.userId, req.user.id)) return cb(new NoPermissionError(`You cannot use other's test plan.`))
+        if (!plan.PlanCollectToQuiz.length) return cb(new NotFoundError('There is no quiz in this plan.'))
         plan = plan.toJSON()
         plan.PlanCollectToQuiz[0]['first'] = true
         plan.PlanCollectToQuiz.map((e) => {
@@ -306,7 +313,7 @@ const quizService = {
               attributes:['id','question','select1','select2','select3','select4','answer']
             }],
         })
-        if (!plan) return cb(new Error('There is no this plan.'))
+        if (!plan) return cb(new NotFoundError('There is no this plan.'))
         plan = plan.toJSON()
         let arr = []
         for (let i in data) arr[Number(i) - 1] = data[i]
@@ -377,6 +384,7 @@ const quizService = {
         const find = await Score.findByPk(id,{
             raw: true,
         })
+        if (!samePerson(find.userId, req.user.id)) return cb(new NoPermissionError('You can not check another people test result.'))
         const quizId = find.allQuizId
         const userAnswer = find.allUserAnswer
         let quizArr = quizId.split(',')
@@ -396,6 +404,11 @@ const quizService = {
             nest: true
         })
         let back = quiz.length - 1
+        // since there might be some quiz be deleted, so need to check. If quiz is shorter than quizArr, means there
+        // are some quiz be deleted. So it will check quizArr[i] is equal to quiz's last element, if equal, means
+        // it's real, so change position to last; however, if not equal, means that quiz had been deleted, so we  
+        // will give this id's quiz a message show this quiz is deleted. Use the loop is to fill the deleted 
+        // quiz's blank
         for (let i = quizArr.length - 1; i >= 0; i--) {
             let t = quiz[back]
             if (Number(quizArr[i]) === t?.id) {
@@ -410,7 +423,6 @@ const quizService = {
                     'notSelect' : true
                 }
             }
-            
         }
         let result = {
             score: find, 
@@ -427,6 +439,8 @@ const quizService = {
         return cb(null, data)
     },
     userEditPage: async (req, cb) => {
+        let id = Number(req.params.id)
+        if (!samePerson(id, req.user.id)) return cb(new NoPermissionError('You can not check another people test result.'))
         const data = {
             ...toPackage('success','edit'),
             user: req.user

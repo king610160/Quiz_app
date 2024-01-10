@@ -14,25 +14,25 @@
         <div class="d-flex flex-column">
             {{#if setting.edit}}
             <h3>Name</h3>
-            <input class="form-control" type="text" class="form-control" id="name" name="name">
+            <input class="form-control" type="text" class="form-control" id="name" name="name" value="{{user.name}}">
             {{else}}
             <h3>Name : {{user.name}}</h3>
             {{/if}}
         </div>
         <div class="d-flex flex-column justify-content-start">
             {{#if setting.edit}}
-            <h3>File :</h3>
-            <input class="form-control info-input" type="file" class="form-control-file" id="file" name="file">
+                <h3>File :</h3>
+                <input class="form-control info-input" type="file" class="form-control-file" id="file" name="file">
             {{else}}
-            <img src="{{user.image}}" class="info mb-4">
+                <img src="{{user.image}}" class="info mb-4">
             {{/if}}
         </div>
         <div class='mid'>
             <h3>User description : </h3>
             {{#if setting.edit}}
-            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                <textarea class="form-control" id="description" name="description" rows="3">{{user.description}}</textarea>
             {{else}}
-            <p>{{user.description}}</p>
+                <p>{{user.description}}</p>
             {{/if}}
         </div>
         <div class="end d-flex flex-column justify-content-center">

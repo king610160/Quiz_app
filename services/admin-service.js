@@ -4,6 +4,7 @@ const { toPackage } = require('../helper/api-helper')
 const adminService = {
     getAllUsers: async (req, cb) => {
         const users = await User.findAll({
+            order: [['id', 'ASC']],
             raw: true,
             nest: true
         })
@@ -15,8 +16,12 @@ const adminService = {
     },
     deleteUser: async (req, cb) => {
         const id = req.params.id
+        if (Number(id) === req.user.id) return cb(new Error('You cannot delete yourselves'))
         let user = await User.findByPk(id)
         if (!user) return cb(new Error('This user is not existed'))
+        let admin = user.toJSON()
+        // eslint-disable-next-line
+        if (admin.isAdmin) return cb(new Error("You can't delete Admin's account."))
         await user.destroy()
         const result = {
             ...toPackage('success',undefined),

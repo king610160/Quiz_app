@@ -141,12 +141,14 @@ const quizController = {
             res.render('users/info')
         })
     },
+    // edit page
     userEditPage: (req, res, next) => {
         quizService.userEditPage(req, (err, data) => {
             if(err) return next(err)
             res.render('users/info', data)
         })
     },
+    // edit user's info, upload the user's photo to imgur
     putUserInfo: (req, res, next) => {
         quizService.putUserInfo(req, (err) => {
             if(err) return next(err)

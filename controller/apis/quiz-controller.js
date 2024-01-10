@@ -114,6 +114,33 @@ const quizController = {
             if(err) return next(err)
             res.json(data)
         })
+    },
+    resultSinglePage: (req, res, next) => {
+        quizService.resultSinglePage(req, (err, data) => {
+            if(err) next(err)
+            res.json(data)
+        })
+    },
+    // change user info
+    userInfoPage: (req, res, next) => {
+        quizService.userInfoPage(req, (err, data) => {
+            if(err) return next(err)
+            res.json(data)
+        })
+    },
+    // edit page
+    userEditPage: (req, res, next) => {
+        quizService.userEditPage(req, (err, data) => {
+            if(err) return next(err)
+            res.json(data)
+        })
+    },
+    // edit user's info, upload the user's photo to imgur
+    putUserInfo: (req, res, next) => {
+        quizService.putUserInfo(req, (err, data) => {
+            if(err) return next(err)
+            res.json(data)
+        })
     }
 }
 
