@@ -20,6 +20,12 @@ const quizController = {
     createQuizPage: (req, res) => {
         res.render('quiz/createQuiz')
     },
+    aiCreateQuiz: (req, res, next) => {
+        quizService.aiCreateQuiz(req, (err, data) => {
+            if (err) return next(err)
+            res.render('quiz/createQuiz', data)
+        })
+    },
     // post the info in the create quiz page
     postQuiz: (req, res, next) => {
         quizService.postQuiz(req, (err) =>{

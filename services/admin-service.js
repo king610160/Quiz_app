@@ -45,6 +45,17 @@ const adminService = {
         }
         return cb(null, data)
     },
+    deleteQuiz: async (req, cb) => {
+        let id = req.params.id
+        const quiz = await Quiz.findByPk(id)
+        if (!quiz) return cb(new NotFoundError('There is no that quiz existed.'))
+        await quiz.destroy()
+        const result = {
+            ...toPackage('success'),
+            quiz: quiz.toJSON()
+        }
+        return cb(null, result)
+    },
     getAllCategory: async (req, cb) => {
         const category = await Category.findAll({
             raw:true,

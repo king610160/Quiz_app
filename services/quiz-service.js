@@ -4,6 +4,9 @@ const { toPackage } = require('../helper/api-helper')
 const { imgurFileHandler } = require('../helper/file-helper')
 const { samePerson } = require('../helper/same-person-helper')
 const { NoPermissionError, NotFoundError, BadRequestError } = require('../middleware/errors')
+const { OpenAI } = require('openai')
+
+
 
 const quizService = {
     home: async(req, cb) => {
@@ -54,6 +57,74 @@ const quizService = {
             quiz: quiz
         }
         return cb(null, result)
+    },
+    aiCreateQuiz: async (req, cb) => {
+        let { ai } = req.body
+        const openai = new OpenAI({
+            apiKey: process.env.OPEN_AI_SECRET_KEY 
+        })
+
+        const userInput = ai.trim()
+        if (userInput.length === 0) return cb(new BadRequestError('Please enter the content!'))
+
+        const messages = [
+            {
+                role: 'user',
+                content: `請只給我1題, "${userInput}" 的4選1的單選題並附上答案是哪個選項. 回覆內容只能有問題, 4個選項及答案, 請完全使用中文回答`,
+            },
+            {
+                role: 'system',
+                content: 'You are a helpful assistant.',
+            },
+        ]
+
+        const completion = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            temperature: 1,
+            messages: messages,
+            max_tokens: 200,
+        })
+
+        let reMessage = completion.choices[0].message.content
+        console.log(reMessage)
+        if (reMessage.includes('抱歉') || reMessage.includes('Sorry') || reMessage.includes('違法')) return cb(new NoPermissionError('AI cannot provide that kind of message to you'))
+
+        // split gpt come back's answer into arr, and filter out empty \n
+        let arr = completion.choices[0].message.content.split('\n')
+        // check return data has some string.
+        if (arr[0].includes('Thank you') || arr[0].includes('謝謝')) arr[0] = ''
+        if (arr[1].includes('option') || arr[1].includes('選項')) arr[1] = ''
+        arr = arr.filter(item => item.trim() !== '')
+        
+        // defined the return data type
+        let data = {
+            ...toPackage('success', undefined),
+        }
+        let quiz = {}
+        quiz.question = arr[0]
+
+        let check = arr[arr.length - 1]
+        // check the answer first
+        for (let i = 1; i < 5; i++) {
+            if (check.includes(arr[i])) {
+                quiz.answer = `select${i}`
+                let select = `select${i}true`
+                data[select] = true
+                break
+            }
+        }
+
+        // set the option to select 1-4
+        for (let i = 1; i < 5; i++) {
+            let temp = arr[i].split(' ')
+            temp.shift()
+            temp = temp.join(' ')
+            quiz[`select${i}`] = temp
+            arr[i] = temp
+        }
+
+        data.quiz = quiz
+        return cb(null, data)
     },
     postQuiz: async (req, cb) => {
         let { question, select1, select2, select3, select4, answer } = req.body

@@ -32,6 +32,7 @@ router.post('/user/collect/:id', quizController.quizAddToPlan)
 
 // quiz page's CURD, make quiz
 router.get('/quiz/create', quizController.createQuizPage)
+router.post('/quiz/ai', quizController.aiCreateQuiz)
 router.get('/quiz/:id', quizController.editQuizPage)
 router.delete('/quiz/:id', quizController.deleteQuiz)
 router.put('/quiz/:id', quizController.editQuiz)

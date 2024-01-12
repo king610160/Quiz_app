@@ -18,6 +18,14 @@ const quizController = {
             })
         })
     },
+    aiCreateQuiz: (req, res, next) => {
+        quizService.aiCreateQuiz(req, (err, data) => {
+            if (err) return next(err)
+            res.json({
+                data
+            })
+        })
+    },
     postQuiz: (req, res, next) => {
         quizService.postQuiz(req, (err, data) =>{
             if (err) return next(err)

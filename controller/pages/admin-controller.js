@@ -23,6 +23,13 @@ const adminController = {
             res.render('admin/allQuiz', data)
         })
     },
+    // delete quiz by admin
+    deleteQuiz: (req, res, next) => {
+        adminService.deleteQuiz(req, (err) => {
+            if (err) return next(err)
+            res.redirect('/admin/quiz')
+        })
+    },
     // get all category
     getAllCategory: (req, res ,next) => {
         adminService.getAllCategory(req, (err, data) => {

@@ -8,6 +8,7 @@ router.delete('/users/:id', adminController.deleteUser)
 router.get('/users', adminController.getAllUsers)
 
 // admin's quiz manipulate, will add thumb and disthumb, may can justify what quiz is bad
+router.delete('/quiz/:id', adminController.deleteQuiz)
 router.get('/quiz', adminController.getAllQuiz)
 
 // admin's category manipulate

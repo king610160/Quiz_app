@@ -27,6 +27,14 @@ const adminController = {
             })
         })
     },
+    deleteQuiz: (req, res, next) => {
+        adminService.deleteQuiz(req, (err, data) => {
+            if (err) return next(err)
+            res.json({
+                data
+            })
+        })
+    },
     getAllCategory: (req, res ,next) => {
         adminService.getAllCategory(req, (err, data) => {
             if (err) return next(err)

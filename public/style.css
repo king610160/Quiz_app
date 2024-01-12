@@ -122,3 +122,16 @@ body {
 .bg-secondary {
     background-color: #6c757d !important;
 }
+
+.ai-grid {
+    width:55%;
+    top: 10%;
+    right: 10%
+}
+
+.ai-input {
+    width: 80%
+}
+.ai-submit {
+    width: 20%
+}
