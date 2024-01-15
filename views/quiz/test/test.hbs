@@ -1,54 +1,59 @@
 <form action="/test/{{plan.id}}" method="POST" class="w-100 d-flex flex-column">
-  <div id="carouselExample" class="carousel slide w-100 test-form" data-bs-interval="false">
-    <div class="carousel-inner">
+  <div id="carouselExample" class="carousel slide w-100 test-form d-flex justify-content-center" data-bs-interval="false">
+    <div class="carousel-inner d-flex justify-content-center">
       {{#each quiz}}
-        <div class="carousel-item w-100 {{#if this.first}}active{{/if}}">
-          <div class="d-block">
-            <p>{{inc @index}}.  {{this.question}}</p>
-            {{#if this.select1}}
-            <div>
-              <label>
-                <input type="radio" name="{{inc @index}}" value='select1'>
-                {{this.select1}}
-              </label>
+        <div class="carousel-item w-100 position-absolute start-0 {{#if this.first}}active{{/if}}">
+          <div class="card">
+            <div class="card-body quiz-options quiz-options-{{inc @index}}">
+              <p class="quiz-description">{{inc @index}}.  {{this.question}}</p>
+              {{#if this.select1}}
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="{{inc @index}}" id="select1-{{inc @index}}" value='select1' onclick="selectOption('select1-{{inc @index}}')">
+                  <label class="form-check-label" for="select1-{{inc @index}}">
+                    {{this.select1}}
+                  </label>
+                </div>
+              {{/if}}
+              {{#if this.select2}}
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="{{inc @index}}" id="select2-{{inc @index}}" value='select2' onclick="selectOption('select2-{{inc @index}}')">
+                  <label class="form-check-label" for="select2-{{inc @index}}">
+                    {{this.select2}}
+                  </label>
+                </div>
+              {{/if}}
+              {{#if this.select3}}
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="{{inc @index}}" id="select3-{{inc @index}}" value='select3' onclick="selectOption('select3-{{inc @index}}')">
+                  <label class="form-check-label" for="select3-{{inc @index}}">
+                    {{this.select3}}
+                  </label>
+                </div>
+              {{/if}}
+              {{#if this.select4}}
+                <div class="form-check">
+                  <input class="form-check-input selected" type="radio" name="{{inc @index}}" id="select4-{{inc @index}}" value='select4' onclick="selectOption('select4-{{inc @index}}')">
+                  <label class="form-check-label" for="select4-{{inc @index}}">
+                    {{this.select4}}
+                  </label>
+                </div>
+              {{/if}}
             </div>
-            {{/if}}
-            {{#if this.select2}}
-            <div>
-              <label>
-                <input type="radio" name="{{inc @index}}" value='select2'>
-                {{this.select2}}
-              </label>
-            </div>
-            {{/if}}
-            {{#if this.select3}}
-            <div>
-              <label>
-                <input type="radio" name="{{inc @index}}" value='select3'>
-                {{this.select3}}
-              </label>
-            </div>
-            {{/if}}
-            {{#if this.select4}}
-            <div>
-              <label>
-                <input type="radio" name="{{inc @index}}" value='select4'>
-                {{this.select4}}
-              </label>
-            </div>
-            {{/if}}
           </div>
         </div>
       {{/each}}
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+
+    <button class="carousel-control-prev carousel-control-button" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Previous</span>
     </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+    <button class="carousel-control-next carousel-control-button" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>
   </div>
-  <button class="btn btn-primary mt-5" type="submit">Submit your test</button>
+  <button class="btn btn-primary mt-3" type="submit">Submit your test</button>
 </form>
+
+<script src="/test.js" defer></script>

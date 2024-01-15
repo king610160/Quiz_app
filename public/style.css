@@ -135,3 +135,42 @@ body {
 .ai-submit {
     width: 20%
 }
+
+/* Add your styles here */
+.quiz-options label {
+    display: block;
+    width: 90%;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.quiz-options label:hover {
+    background-color: #6c757d;
+    color:#fff;
+    border: 1px solid #e0ea4f;
+}
+
+.quiz-options div input {
+    opacity: 0
+}
+
+.quiz-options div label.selected {
+    background-color: #222222;
+    color: #fff;
+}
+
+.carousel-inner {
+    width: 80%
+}
+
+.carousel-control-button {
+    width: 9%
+}
+
+.quiz-description {
+    width: 90%;
+    margin-left: 30px
+}
