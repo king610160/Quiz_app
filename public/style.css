@@ -183,7 +183,15 @@ body {
     color: #ddd6f3
 }
 
-.outer-logo::before {
+.outer-logo {
     width: 40px;
-    height: 40px
+    height: 40px;
+    color: #ffffff;
+    background-color: dodgerblue;
+    border-radius: 5px;
+}
+
+.outer-logo:hover {
+    color: dodgerblue;
+    background-color: #ffffff;
 }

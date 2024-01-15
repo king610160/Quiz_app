@@ -1,6 +1,7 @@
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const FacebookStrategy = require('passport-facebook').Strategy
+const GoogleStrategy = require('passport-google-oauth20').Strategy
 const passportJWT = require('passport-jwt')
 const bcrypt = require('bcryptjs')
 const { User, Plan } = require('../models')
@@ -37,6 +38,30 @@ passport.use(new FacebookStrategy({
     clientID: process.env.FB_PROJECT_NO,
     clientSecret: process.env.FB_PROJECT_PASSWORD,
     callbackURL: 'http://localhost:3000/auth/facebook/callback',
+    profileFields: ['email', 'displayName']
+}, async (accessToken, refreshToken, profile, done) =>  {
+    try {
+        const { email, name } = profile._json
+        const result = await User.findOne({ where: { email }})
+        if (result) return done(null, result)
+        const randomPassword = Math.random().toString(36).slice(-8)
+        const hashPassword = await bcrypt.hash(randomPassword, 10)
+        let user = await User.create({ 
+            name: name,
+            email: email,
+            password: hashPassword
+        })
+        return done(null, user)
+    } catch(err) {
+        return done(err, false)
+    }
+}))
+
+// google login
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_PROJECT_NO,
+    clientSecret: process.env.GOOGLE_PROJECT_PASSWORD,
+    callbackURL: 'http://localhost:3000/auth/google/callback',
     profileFields: ['email', 'displayName']
 }, async (accessToken, refreshToken, profile, done) =>  {
     try {
