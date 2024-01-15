@@ -11,10 +11,16 @@
             Your password must be 8-20 characters long, contain letters and numbers, and must not contain spaces, special characters, or emoji.
         </div>
         
-        <div class="d-flex flex-rows mt-4 align-items-center">
-            <button class="btn btn-primary" type="submit">Login</button>
-            <div class="ms-5">  
-                <a href="/users/register">Register</a>
+        <div class="d-flex flex-column mt-4 align-items-center">
+            <div class="d-flex flex-row w-100">
+                <button class="btn btn-primary mb-3 me-5" type="submit">Login</button>
+                <a href="/auth/facebook" class="mb-3 icon">
+                    <i class="fa-brands fa-square-facebook fa-2xl"></i>
+                </a>
+            </div>
+            <div class="d-flex flex-rows w-100"> 
+                <p class="me-3">Have no acoount?</p> 
+                <a href="/users/register" id="register">Register</a>
             </div> 
         </div>
     </form>
