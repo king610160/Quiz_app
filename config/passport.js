@@ -37,7 +37,7 @@ passport.use(new LocalStrategy(
 passport.use(new FacebookStrategy({
     clientID: process.env.FB_PROJECT_NO,
     clientSecret: process.env.FB_PROJECT_PASSWORD,
-    callbackURL: 'http://localhost:3000/auth/facebook/callback',
+    callbackURL: 'https://lets-quiz.onrender.com/auth/facebook/callback',
     profileFields: ['email', 'displayName']
 }, async (accessToken, refreshToken, profile, done) =>  {
     try {
@@ -57,11 +57,11 @@ passport.use(new FacebookStrategy({
     }
 }))
 
-// google login
+// google login, google cloud platform
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_PROJECT_NO,
     clientSecret: process.env.GOOGLE_PROJECT_PASSWORD,
-    callbackURL: 'http://localhost:3000/auth/google/callback',
+    callbackURL: 'https://lets-quiz.onrender.com/auth/google/callback',
     profileFields: ['email', 'displayName']
 }, async (accessToken, refreshToken, profile, done) =>  {
     try {
