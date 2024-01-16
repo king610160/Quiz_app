@@ -14,7 +14,7 @@ const handlebarsHelper = require('./helper/handlebars-helper')
 const path = require('path')
 
 // extra security
-// const helmet = require('helmet')
+const helmet = require('helmet')
 const cors = require('cors')
 const xss = require('xss-clean')
 const rateLimit = require('express-rate-limit')
@@ -31,7 +31,7 @@ const limiter = rateLimit({
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
 app.use(limiter)
-// app.use(helmet())
+app.use(helmet())
 app.use(cors())
 app.use(xss())
 

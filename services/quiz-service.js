@@ -120,6 +120,7 @@ const quizService = {
             })
 
             let reMessage = completion.choices[0].message.content
+            console.log(reMessage)
             // check what gpt says, so need to console.log
             if (reMessage.includes('抱歉') || reMessage.includes('Sorry') || reMessage.includes('違法')) return cb(new NoPermissionError('AI cannot provide that kind of message to you'))
 
@@ -129,9 +130,6 @@ const quizService = {
             if (arr[0].includes('Thank you') || arr[0].includes('謝謝')) arr[0] = ''
             if (arr[1].includes('：') || arr[1].includes(':')) arr[1] = ''
             arr = arr.filter(item => item.trim() !== '')
-            console.log(arr[1].includes('：'))
-            console.log(arr[1].includes(':'))
-            console.log(arr[1])
             
             // defined the return data type
             let data = {
