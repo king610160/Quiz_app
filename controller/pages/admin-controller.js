@@ -5,7 +5,7 @@ const adminController = {
     getAllUsers: (req, res, next) => {
         adminService.getAllUsers(req, (err, data) => {
             if (err) return next(err)
-            res.render('admin/allUser', {users: data.users, setting: data.setting})
+            res.render('admin/allUser', data)
         })
     },
     // delete user

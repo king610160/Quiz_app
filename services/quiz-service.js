@@ -33,6 +33,7 @@ const quizService = {
                         [Sequelize.Op.like]: `%${searchValue}%`
                     }
                 },
+                order: [['createdAt', 'DESC']],
                 limit,
                 offset,
                 raw: true,
@@ -50,7 +51,8 @@ const quizService = {
                 quiz: quiz.rows,
                 count: quiz.count,
                 search: searchValue,
-                pagination: getPagination(limit, page, quiz.count)
+                pagination: getPagination(limit, page, quiz.count),
+                pgsetting: 'home'
             }
             return cb(null, data)
         } catch (err) {
@@ -68,6 +70,7 @@ const quizService = {
                 where: {
                     user_id: req.user.id
                 },
+                order: [['createdAt', 'DESC']],
                 limit,
                 offset,
                 raw:true,
@@ -80,7 +83,8 @@ const quizService = {
             const result = {
                 ...toPackage('success'),
                 quiz: quiz.rows,
-                pagination: getPagination(limit, page, quiz.count)
+                pagination: getPagination(limit, page, quiz.count),
+                pgsetting: 'quiz',
             }
             return cb(null, result)
         } catch (err) {
@@ -100,7 +104,7 @@ const quizService = {
             const messages = [
                 {
                     role: 'user',
-                    content: `請只給我1題, "${userInput}" 的4選1的單選題並附上答案是哪個選項. 回覆內容只能有問題, 4個選項及答案, 請完全使用中文回答`,
+                    content: `請只給我1題, "${userInput}" 的4選1的單選題並附上答案是哪個選項. 回覆內容只能有問題, 4個選項及答案, 請完全使用繁體中文回答`,
                 },
                 {
                     role: 'system',
@@ -116,14 +120,18 @@ const quizService = {
             })
 
             let reMessage = completion.choices[0].message.content
+            // check what gpt says, so need to console.log
             if (reMessage.includes('抱歉') || reMessage.includes('Sorry') || reMessage.includes('違法')) return cb(new NoPermissionError('AI cannot provide that kind of message to you'))
 
             // split gpt come back's answer into arr, and filter out empty \n
             let arr = completion.choices[0].message.content.split('\n')
             // check return data has some string.
             if (arr[0].includes('Thank you') || arr[0].includes('謝謝')) arr[0] = ''
-            if (arr[1].includes('option') || arr[1].includes('選項')) arr[1] = ''
+            if (arr[1].includes('：') || arr[1].includes(':')) arr[1] = ''
             arr = arr.filter(item => item.trim() !== '')
+            console.log(arr[1].includes('：'))
+            console.log(arr[1].includes(':'))
+            console.log(arr[1])
             
             // defined the return data type
             let data = {
@@ -274,7 +282,8 @@ const quizService = {
                 ...toPackage('success'),
                 plan: plan.rows,
                 user,
-                pagination: getPagination(limit, page, plan.count)
+                pagination: getPagination(limit, page, plan.count),
+                pgsetting: 'plan',
             }
             return cb(null, result)
         } catch (err) {
@@ -548,11 +557,11 @@ const quizService = {
                 raw: true,
                 nest: true
             }) 
-            console.log(result.count)
             let score = {
                 ...toPackage('success'),
                 score: result.rows,
-                pagination: getPagination(limit, page, result.count)
+                pagination: getPagination(limit, page, result.count),
+                pgsetting: 'result'
             }
             return cb(null, score)
         } catch (err) {
