@@ -86,7 +86,6 @@ const quizService = {
         })
 
         let reMessage = completion.choices[0].message.content
-        console.log(reMessage)
         if (reMessage.includes('抱歉') || reMessage.includes('Sorry') || reMessage.includes('違法')) return cb(new NoPermissionError('AI cannot provide that kind of message to you'))
 
         // split gpt come back's answer into arr, and filter out empty \n
@@ -240,13 +239,21 @@ const quizService = {
     },
     deletePlan: async (req, cb) => {
         const id = req.params.id
-        let plan = await Plan.findByPk(id)
+        let [plan, user] = await Promise.all([
+            Plan.findByPk(id),
+            User.findByPk(req.user.id)
+        ])
         if (!plan) return cb(new NotFoundError('There is no this plan in the database.'))
         if (!samePerson(plan.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You can not delete other user\'s plan.'))
+        if (user.planId === Number(id)) {
+            await user.update({
+                planId: null
+            })
+        }
         await plan.destroy()
         const result = {
             ...toPackage('success'),
-            plan: plan.toJSON()
+            update: plan.toJSON()
         }
         return cb(null, result)
     },
