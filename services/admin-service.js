@@ -4,16 +4,20 @@ const { NoPermissionError, NotFoundError, BadRequestError } = require('../middle
 
 const adminService = {
     getAllUsers: async (req, cb) => {
-        const users = await User.findAll({
-            order: [['id', 'ASC']],
-            raw: true,
-            nest: true
-        })
-        const data = {
-            ...toPackage('success','user'),
-            users
+        try {
+            const users = await User.findAll({
+                order: [['id', 'ASC']],
+                raw: true,
+                nest: true
+            })
+            const data = {
+                ...toPackage('success','user'),
+                users
+            }
+            return cb(null, data)
+        } catch(err) {
+            return cb(err)
         }
-        return cb(null, data)
     },
     deleteUser: async (req, cb) => {
         const id = req.params.id

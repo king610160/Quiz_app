@@ -123,6 +123,12 @@ const quizController = {
             res.json(data)
         })
     },
+    deleteResult: (req, res, next) => {
+        quizService.deleteResult(req, (err, data) => {
+            if (err) return next(err)
+            res.json(data)
+        })
+    },
     resultSinglePage: (req, res, next) => {
         quizService.resultSinglePage(req, (err, data) => {
             if(err) next(err)

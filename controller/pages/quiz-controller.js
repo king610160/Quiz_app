@@ -13,7 +13,7 @@ const quizController = {
     quizPage: (req, res, next) => {
         quizService.quizPage(req, (err, data) => {
             if (err) next(err)
-            res.render('quiz/quiz', {quiz: data.quiz})
+            res.render('quiz/quiz', data)
         })
     },
     // create quiz page
@@ -132,6 +132,13 @@ const quizController = {
         quizService.resultPage(req, (err, data) => {
             if(err) next(err)
             res.render('quiz/result/result', data)
+        })
+    },
+    // delete test result (collection)
+    deleteResult: (req, res, next) => {
+        quizService.deleteResult(req, (err) => {
+            if (err) return next(err)
+            res.redirect('/result')
         })
     },
     resultSinglePage: (req, res, next) => {

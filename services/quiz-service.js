@@ -60,20 +60,27 @@ const quizService = {
     },
     quizPage: async(req, cb) => {
         try {
-            const quiz = await Quiz.findAll({
+            const DEFAULT_LIMIT = 10
+            const page = Number(req.query.page) || 1
+            const limit = DEFAULT_LIMIT
+            const offset = getOffset(limit, page)
+            const quiz = await Quiz.findAndCountAll({
                 where: {
                     user_id: req.user.id
                 },
+                limit,
+                offset,
                 raw:true,
                 nest:true,
             })
-            quiz.forEach((e) => {
+            quiz.rows.forEach((e) => {
                 let check = `${e.answer}true`
                 e[check] = true
             })
             const result = {
                 ...toPackage('success'),
-                quiz: quiz
+                quiz: quiz.rows,
+                pagination: getPagination(limit, page, quiz.count)
             }
             return cb(null, result)
         } catch (err) {
@@ -81,490 +88,594 @@ const quizService = {
         }
     },
     aiCreateQuiz: async (req, cb) => {
-        let { ai } = req.body
-        const openai = new OpenAI({
-            apiKey: process.env.OPEN_AI_SECRET_KEY 
-        })
+        try {
+            let { ai } = req.body
+            const openai = new OpenAI({
+                apiKey: process.env.OPEN_AI_SECRET_KEY 
+            })
 
-        const userInput = ai.trim()
-        if (userInput.length === 0) return cb(new BadRequestError('Please enter the content!'))
+            const userInput = ai.trim()
+            if (userInput.length === 0) return cb(new BadRequestError('Please enter the content!'))
 
-        const messages = [
-            {
-                role: 'user',
-                content: `請只給我1題, "${userInput}" 的4選1的單選題並附上答案是哪個選項. 回覆內容只能有問題, 4個選項及答案, 請完全使用中文回答`,
-            },
-            {
-                role: 'system',
-                content: 'You are a helpful assistant.',
-            },
-        ]
+            const messages = [
+                {
+                    role: 'user',
+                    content: `請只給我1題, "${userInput}" 的4選1的單選題並附上答案是哪個選項. 回覆內容只能有問題, 4個選項及答案, 請完全使用中文回答`,
+                },
+                {
+                    role: 'system',
+                    content: 'You are a helpful assistant.',
+                },
+            ]
 
-        const completion = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo',
-            temperature: 1,
-            messages: messages,
-            max_tokens: 200,
-        })
+            const completion = await openai.chat.completions.create({
+                model: 'gpt-3.5-turbo',
+                temperature: 1,
+                messages: messages,
+                max_tokens: 200,
+            })
 
-        let reMessage = completion.choices[0].message.content
-        if (reMessage.includes('抱歉') || reMessage.includes('Sorry') || reMessage.includes('違法')) return cb(new NoPermissionError('AI cannot provide that kind of message to you'))
+            let reMessage = completion.choices[0].message.content
+            if (reMessage.includes('抱歉') || reMessage.includes('Sorry') || reMessage.includes('違法')) return cb(new NoPermissionError('AI cannot provide that kind of message to you'))
 
-        // split gpt come back's answer into arr, and filter out empty \n
-        let arr = completion.choices[0].message.content.split('\n')
-        // check return data has some string.
-        if (arr[0].includes('Thank you') || arr[0].includes('謝謝')) arr[0] = ''
-        if (arr[1].includes('option') || arr[1].includes('選項')) arr[1] = ''
-        arr = arr.filter(item => item.trim() !== '')
-        
-        // defined the return data type
-        let data = {
-            ...toPackage('success', undefined),
-        }
-        let quiz = {}
-        quiz.question = arr[0]
-
-        let check = arr[arr.length - 1]
-        // check the answer first
-        for (let i = 1; i < 5; i++) {
-            if (check.includes(arr[i])) {
-                quiz.answer = `select${i}`
-                let select = `select${i}true`
-                data[select] = true
-                break
+            // split gpt come back's answer into arr, and filter out empty \n
+            let arr = completion.choices[0].message.content.split('\n')
+            // check return data has some string.
+            if (arr[0].includes('Thank you') || arr[0].includes('謝謝')) arr[0] = ''
+            if (arr[1].includes('option') || arr[1].includes('選項')) arr[1] = ''
+            arr = arr.filter(item => item.trim() !== '')
+            
+            // defined the return data type
+            let data = {
+                ...toPackage('success', undefined),
             }
-        }
+            let quiz = {}
+            quiz.question = arr[0]
 
-        // set the option to select 1-4
-        for (let i = 1; i < 5; i++) {
-            let temp = arr[i].split(' ')
-            temp.shift()
-            temp = temp.join(' ')
-            quiz[`select${i}`] = temp
-            arr[i] = temp
-        }
+            let check = arr[arr.length - 1]
+            // check the answer first
+            for (let i = 1; i < 5; i++) {
+                if (check.includes(arr[i])) {
+                    quiz.answer = `select${i}`
+                    let select = `select${i}true`
+                    data[select] = true
+                    break
+                }
+            }
 
-        data.quiz = quiz
-        return cb(null, data)
+            // set the option to select 1-4
+            for (let i = 1; i < 5; i++) {
+                let temp = arr[i].split(' ')
+                temp.shift()
+                temp = temp.join(' ')
+                quiz[`select${i}`] = temp
+                arr[i] = temp
+            }
+
+            data.quiz = quiz
+            return cb(null, data)
+        } catch (err) {
+            return cb(err)
+        }
     },
     postQuiz: async (req, cb) => {
-        let { question, select1, select2, select3, select4, answer } = req.body
-        if (!question || !select1) return cb(new BadRequestError('Please fill question and at least an option.'))
-        if (answer === '0') return cb(new BadRequestError('Please select the answer'))
-        const quiz = await Quiz.create({
-            question,
-            select1,
-            select2,
-            select3,
-            select4,
-            answer,
-            userId: req.user.id
-        })
-
-        const result = {
-            ...toPackage('success'),
-            quiz
+        try {
+            let { question, select1, select2, select3, select4, answer } = req.body
+            if (!question || !select1) return cb(new BadRequestError('Please fill question and at least an option.'))
+            if (answer === '0') return cb(new BadRequestError('Please select the answer'))
+            const quiz = await Quiz.create({
+                question,
+                select1,
+                select2,
+                select3,
+                select4,
+                answer,
+                userId: req.user.id
+            })
+            const result = {
+                ...toPackage('success'),
+                quiz
+            }
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
         }
-
-        return cb(null, result)
     },
     editQuizPage: async (req, cb) => {
-        let id = req.params.id
-        let quiz = await Quiz.findByPk(id)
-        if (!quiz) return cb(new NotFoundError('There is no that quiz existed.'))
-        if (!samePerson(quiz.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You cannot edit other user\'s quiz.'))
-        quiz = quiz.toJSON()
-        let data = {
-            ...toPackage('success'),
-            quiz
-        }
-        for(const key in quiz) {
-            if (key.includes(quiz.answer.toString())) {
-                let check = `${key}true`
-                data[check] = true
+        try {
+            let id = req.params.id
+            let quiz = await Quiz.findByPk(id)
+            if (!quiz) return cb(new NotFoundError('There is no that quiz existed.'))
+            if (!samePerson(quiz.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You cannot edit other user\'s quiz.'))
+            quiz = quiz.toJSON()
+            let data = {
+                ...toPackage('success'),
+                quiz
             }
+            for(const key in quiz) {
+                if (key.includes(quiz.answer.toString())) {
+                    let check = `${key}true`
+                    data[check] = true
+                }
+            }
+            return cb(null, data)
+        } catch(err) {
+            return cb(err)
         }
-        return cb(null, data)
     },
     editQuiz: async (req, cb) => {
-        let { question, select1, select2, select3, select4, answer } = req.body
-        let id = req.params.id
-        if (!question || !select1) return cb(new BadRequestError('Please fill question and at least an option.'))
-        if (answer === '0') return cb(new BadRequestError('Please select the answer'))
+        try {
+            let { question, select1, select2, select3, select4, answer } = req.body
+            let id = req.params.id
+            if (!question || !select1) return cb(new BadRequestError('Please fill question and at least an option.'))
+            if (answer === '0') return cb(new BadRequestError('Please select the answer'))
 
-        const quiz = await Quiz.findByPk(id)
-        if (!samePerson(quiz.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You cannot edit other user\'s quiz.'))
-        if (!quiz) return cb(new NotFoundError('There is no that quiz existed.'))
-        let update = await quiz.update({
-            question,
-            select1,
-            select2,
-            select3,
-            select4,
-            answer
-        })
-        const result = {
-            ...toPackage('success'),
-            quiz: update.toJSON()
+            const quiz = await Quiz.findByPk(id)
+            if (!samePerson(quiz.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You cannot edit other user\'s quiz.'))
+            if (!quiz) return cb(new NotFoundError('There is no that quiz existed.'))
+            let update = await quiz.update({
+                question,
+                select1,
+                select2,
+                select3,
+                select4,
+                answer
+            })
+            const result = {
+                ...toPackage('success'),
+                quiz: update.toJSON()
+            }
+
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
         }
-
-        return cb(null, result)
     },
     deleteQuiz: async (req, cb) => {
-        let id = req.params.id
-        const quiz = await Quiz.findByPk(id)
-        if (!samePerson(quiz.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You cannot delete other user\'s quiz'))
-        if (!quiz) return cb(new NotFoundError('There is no that quiz existed.'))
-        await quiz.destroy()
-        const result = {
-            ...toPackage('success'),
-            quiz: quiz.toJSON()
+        try {
+            let id = req.params.id
+            const quiz = await Quiz.findByPk(id)
+            if (!samePerson(quiz.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You cannot delete other user\'s quiz'))
+            if (!quiz) return cb(new NotFoundError('There is no that quiz existed.'))
+            await quiz.destroy()
+            const result = {
+                ...toPackage('success'),
+                quiz: quiz.toJSON()
+            }
+            return cb(null, result)
+        } catch(err) {
+            return cb(err)
         }
-        return cb(null, result)
     },
     planPage: async (req, cb) => {
-        const id = req.user.id
-        let [plan, user] = await Promise.all([
-            Plan.findAll({
-                where: {
-                    userId: id
-                },
-                order: [['createdAt', 'DESC']],
-                raw: true,
-                nest: true
-            }),
-            User.findByPk(id, {
-                include: [{model: Plan}]
-            })
-        ])
-        user = user.toJSON()
-        let result = {
-            ...toPackage('success'),
-            plan,
-            user
+        try {
+            const id = req.user.id
+            const DEFAULT_LIMIT = 9
+            const page = Number(req.query.page) || 1
+            const limit = DEFAULT_LIMIT
+            const offset = getOffset(limit, page)
+            let [plan, user] = await Promise.all([
+                Plan.findAndCountAll({
+                    where: {
+                        userId: id
+                    },
+                    order: [['createdAt', 'DESC']],
+                    limit,
+                    offset,
+                    raw: true,
+                    nest: true
+                }),
+                User.findByPk(id, {
+                    include: [{model: Plan}]
+                })
+            ])
+            user = user.toJSON()
+            let result = {
+                ...toPackage('success'),
+                plan: plan.rows,
+                user,
+                pagination: getPagination(limit, page, plan.count)
+            }
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
         }
-
-        return cb(null, result)
     },
     postPlan: async (req, cb) => {
-        let { name } = req.body
-        const id = req.user.id
-        const plan = await Plan.create({
-            name,
-            userId:id
-        })
-        const result = {
-            ...toPackage('success'),
-            plan: plan.toJSON()
+        try {
+            let { name } = req.body
+            const id = req.user.id
+            const plan = await Plan.create({
+                name,
+                userId:id
+            })
+            const result = {
+                ...toPackage('success'),
+                plan: plan.toJSON()
+            }
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
         }
-        return cb(null, result)
     },
     deletePlan: async (req, cb) => {
-        const id = req.params.id
-        let [plan, user] = await Promise.all([
-            Plan.findByPk(id),
-            User.findByPk(req.user.id)
-        ])
-        if (!plan) return cb(new NotFoundError('There is no this plan in the database.'))
-        if (!samePerson(plan.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You can not delete other user\'s plan.'))
-        if (user.planId === Number(id)) {
-            await user.update({
-                planId: null
-            })
+        try {
+            const id = req.params.id
+            let [plan, user] = await Promise.all([
+                Plan.findByPk(id),
+                User.findByPk(req.user.id)
+            ])
+            if (!plan) return cb(new NotFoundError('There is no this plan in the database.'))
+            if (!samePerson(plan.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You can not delete other user\'s plan.'))
+            if (user.planId === Number(id)) {
+                await user.update({
+                    planId: null
+                })
+            }
+            await plan.destroy()
+            const result = {
+                ...toPackage('success'),
+                update: plan.toJSON()
+            }
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
         }
-        await plan.destroy()
-        const result = {
-            ...toPackage('success'),
-            update: plan.toJSON()
-        }
-        return cb(null, result)
     },
     changeDefaultFolder: async (req, cb) => {
-        const userId = req.user.id
-        const id = req.params.id
-        const check = await User.findByPk(userId)
-        if(!check) return cb(new NotFoundError('There is no this plan.'))
-        await check.update({
-            planId: id
-        })
-        const user = await User.findByPk(userId,{
-            include: [{
-                model: Plan,
-            }]
-        })
-        const result = {
-            ...toPackage('success'),
-            user: user.toJSON()
+        try {
+            const userId = req.user.id
+            const id = req.params.id
+            const check = await User.findByPk(userId)
+            if(!check) return cb(new NotFoundError('There is no this plan.'))
+            await check.update({
+                planId: id
+            })
+            const user = await User.findByPk(userId,{
+                include: [{
+                    model: Plan,
+                }]
+            })
+            const result = {
+                ...toPackage('success'),
+                user: user.toJSON()
+            }
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
         }
-        return cb(null, result)
     },
     singlePlanPage: async (req, cb) => {
-        const id = req.params.id
-        const plan = await Plan.findByPk(id, {
-            include: [{
-              model: Quiz,
-              as: 'PlanCollectToQuiz',
-            }],
-        })        
-        if (!plan) return cb(new NotFoundError('There is no this plan existed.'))
-        if (!samePerson(plan.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You cannot check other\'s plan.'))
-        let deal =  plan.toJSON()
-        if (!deal.PlanCollectToQuiz.length) return cb(new NotFoundError('There is no quiz in this plan.'))
-        for (let i of deal.PlanCollectToQuiz) {
-            delete i.Collection
-            const check = i.answer
-            i[`${check}true`] = true
+        try {
+            const id = req.params.id
+            const plan = await Plan.findByPk(id, {
+                include: [{
+                  model: Quiz,
+                  as: 'PlanCollectToQuiz',
+                }],
+            })        
+            if (!plan) return cb(new NotFoundError('There is no this plan existed.'))
+            if (!samePerson(plan.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You cannot check other\'s plan.'))
+            let deal =  plan.toJSON()
+            if (!deal.PlanCollectToQuiz.length) return cb(new NotFoundError('There is no quiz in this plan.'))
+            for (let i of deal.PlanCollectToQuiz) {
+                delete i.Collection
+                const check = i.answer
+                i[`${check}true`] = true
+            }
+            const result = {
+                ...toPackage('success'),
+                plan: deal
+            }
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
         }
-        const result = {
-            ...toPackage('success'),
-            plan: deal
-        }
-        return cb(null, result)
     },
     singlePlanDeleteQuiz: async (req, cb) => {
-        const quizId = req.params.id
-        const planId = req.body.planId
-        const [find, findAll]= await Promise.all([
-            Collection.findOne({
-                where:{
-                    quizId,
-                    planId
-                }
-            }),
-            Collection.findAll({
-                where:{
-                    planId,
-                    userId: req.user.id
-                },
-                raw: true
-            }),
-        ])
-        
-        if (!find) return cb(new NotFoundError('There is no quiz in the plan'))
-        find.destroy()
-        let result = {
-            ...toPackage('success'),
-            quiz: find.toJSON(),
-            quizLength: findAll.length - 1,
-            planId
+        try {
+            const quizId = req.params.id
+            const planId = req.body.planId
+            const [find, findAll]= await Promise.all([
+                Collection.findOne({
+                    where:{
+                        quizId,
+                        planId
+                    }
+                }),
+                Collection.findAll({
+                    where:{
+                        planId,
+                        userId: req.user.id
+                    },
+                    raw: true
+                }),
+            ])
+            
+            if (!find) return cb(new NotFoundError('There is no quiz in the plan'))
+            find.destroy()
+            let result = {
+                ...toPackage('success'),
+                quiz: find.toJSON(),
+                quizLength: findAll.length - 1,
+                planId
+            }
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
         }
-        return cb(null, result)
     },
     quizAddToPlan: async (req, cb) => {
-        const quizId = req.params.id
-        const planId = req.user.planId
-        const userId = req.user.id
-        const find = await Collection.findOne({
-            where:{
+        try {
+            const quizId = req.params.id
+            const planId = req.user.planId
+            const userId = req.user.id
+            const find = await Collection.findOne({
+                where:{
+                    quizId,
+                    planId,
+                    userId
+                }
+            })
+            if (find) return cb(new NoPermissionError('Already collect it in the default folder.'))
+            const create = await Collection.create({
                 quizId,
                 planId,
                 userId
+            })
+            const result = {
+                ...toPackage('success'),
+                collection: create
             }
-        })
-        if (find) return cb(new NoPermissionError('Already collect it in the default folder.'))
-        const create = await Collection.create({
-            quizId,
-            planId,
-            userId
-        })
-        const result = {
-            ...toPackage('success'),
-            collection: create
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
         }
-        return cb(null, result)
     },
     test: async (req, cb) => {
-        const planId = req.params.id
+        try {
+            const planId = req.params.id
 
-        let plan = await Plan.findByPk(planId, {
-            include: [{
-              model: Quiz,
-              as: 'PlanCollectToQuiz',
-              attributes:['id','question','select1','select2','select3','select4','answer']
-            }],
-        })
-        if(!samePerson(plan.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You cannot use other\'s test plan.'))
-        if (!plan.PlanCollectToQuiz.length) return cb(new NotFoundError('There is no quiz in this plan.'))
-        plan = plan.toJSON()
-        plan.PlanCollectToQuiz[0]['first'] = true
-        plan.PlanCollectToQuiz.map((e) => {
-            delete e.Collection
-            if (!e.select1.trim()) delete e.select1
-            if (!e.select2.trim()) delete e.select2
-            if (!e.select3.trim()) delete e.select3
-            if (!e.select4.trim()) delete e.select4
-        })
-        const result = {
-            ...toPackage('success'),
-            quiz : plan.PlanCollectToQuiz,
-            plan: {
-                id: plan.id
+            let plan = await Plan.findByPk(planId, {
+                include: [{
+                model: Quiz,
+                as: 'PlanCollectToQuiz',
+                attributes:['id','question','select1','select2','select3','select4','answer']
+                }],
+            })
+            if(!samePerson(plan.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You cannot use other\'s test plan.'))
+            if (!plan.PlanCollectToQuiz.length) return cb(new NotFoundError('There is no quiz in this plan.'))
+            plan = plan.toJSON()
+            plan.PlanCollectToQuiz[0]['first'] = true
+            plan.PlanCollectToQuiz.map((e) => {
+                delete e.Collection
+                if (!e.select1.trim()) delete e.select1
+                if (!e.select2.trim()) delete e.select2
+                if (!e.select3.trim()) delete e.select3
+                if (!e.select4.trim()) delete e.select4
+            })
+            const result = {
+                ...toPackage('success'),
+                quiz : plan.PlanCollectToQuiz,
+                plan: {
+                    id: plan.id
+                }
             }
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
         }
-        return cb(null, result)
     },
     postTest: async (req, cb) => {
-        let data = req.body
-        const planId = req.params.id
-        const userId = req.user.id
-        let plan = await Plan.findByPk(planId, {
-            include: [{
-              model: Quiz,
-              as: 'PlanCollectToQuiz',
-              attributes:['id','question','select1','select2','select3','select4','answer']
-            }],
-        })
-        if (!plan) return cb(new NotFoundError('There is no this plan.'))
-        plan = plan.toJSON()
-        let arr = []
-        for (let i in data) arr[Number(i) - 1] = data[i]
-        let check = plan.PlanCollectToQuiz
-        let l = check.length
-        let count = 0
-        // ansStr is all the quiz real answer
-        // inputStr is user's all quiz's input
-        // allQuizId is all the quiz's id
-        // correct is to record the quiz is correct or not
-        let allQuizAnswer = ''
-        let allUserAnswer = ''
-        let allQuizId = ''
-        let correct = ''
-        for (let i = 0; i < l; i++) {
-            let realAnswer = check[i].answer
-            let rl = realAnswer.length - 1
-            let userAnswer = arr[i]
-            let ul = userAnswer?.length - 1
-            if (realAnswer === userAnswer) count++
-            correct += (realAnswer === userAnswer) ? '1' : '0'
-            allQuizAnswer += check[i].answer[rl]
-            allUserAnswer += arr[i] ? arr[i][ul] : '0'
-            allQuizId += `${check[i].id},`
-        }
-        let score = count * 100 / l
-        score = Number(score.toFixed(2))
-        let result = await Score.create({
-            score,
-            planId,
-            userId,
-            allQuizAnswer,
-            allUserAnswer,
-            allQuizId,
-            correct
-        })
-        result = {
-            ...toPackage('success'),
-            result
-        }
+        try {
+            let data = req.body
+            const planId = req.params.id
+            const userId = req.user.id
+            let plan = await Plan.findByPk(planId, {
+                include: [{
+                model: Quiz,
+                as: 'PlanCollectToQuiz',
+                attributes:['id','question','select1','select2','select3','select4','answer']
+                }],
+            })
+            if (!plan) return cb(new NotFoundError('There is no this plan.'))
+            plan = plan.toJSON()
+            let arr = []
+            for (let i in data) arr[Number(i) - 1] = data[i]
+            let check = plan.PlanCollectToQuiz
+            let l = check.length
+            let count = 0
+            // ansStr is all the quiz real answer
+            // inputStr is user's all quiz's input
+            // allQuizId is all the quiz's id
+            // correct is to record the quiz is correct or not
+            let allQuizAnswer = ''
+            let allUserAnswer = ''
+            let allQuizId = ''
+            let correct = ''
+            for (let i = 0; i < l; i++) {
+                let realAnswer = check[i].answer
+                let rl = realAnswer.length - 1
+                let userAnswer = arr[i]
+                let ul = userAnswer?.length - 1
+                if (realAnswer === userAnswer) count++
+                correct += (realAnswer === userAnswer) ? '1' : '0'
+                allQuizAnswer += check[i].answer[rl]
+                allUserAnswer += arr[i] ? arr[i][ul] : '0'
+                allQuizId += `${check[i].id},`
+            }
+            let score = count * 100 / l
+            score = Number(score.toFixed(2))
+            let result = await Score.create({
+                score,
+                planId,
+                userId,
+                allQuizAnswer,
+                allUserAnswer,
+                allQuizId,
+                correct
+            })
+            result = {
+                ...toPackage('success'),
+                result
+            }
 
-        req.flash('success_msg',`Test Plan (${plan.name}) , Total score: ${score.toFixed(2)}`)
-        return cb(null, result)
+            req.flash('success_msg',`Test Plan (${plan.name}) , Total score: ${score.toFixed(2)}`)
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
+        }
+        
     },
     resultPage: async (req, cb) => {
-        const userId = req.user.id
-        let result = await Score.findAll({
-            where:{
-                userId
-            },
-            include: [{
-                model: Plan,
-                attributes: ['id','name']
-            }],
-            order: [['createdAt', 'DESC']],
-            raw: true,
-            nest: true
-        }) 
-
-        let score = {
-            ...toPackage('success'),
-            score: result
+        try {
+            const userId = req.user.id
+            const DEFAULT_LIMIT = 5
+            const page = Number(req.query.page) || 1
+            const limit = DEFAULT_LIMIT
+            const offset = getOffset(limit, page)
+            let result = await Score.findAndCountAll({
+                where:{
+                    userId
+                },
+                include: [{
+                    model: Plan,
+                    attributes: ['id','name']
+                }],
+                order: [['createdAt', 'DESC']],
+                limit,
+                offset,
+                raw: true,
+                nest: true
+            }) 
+            console.log(result.count)
+            let score = {
+                ...toPackage('success'),
+                score: result.rows,
+                pagination: getPagination(limit, page, result.count)
+            }
+            return cb(null, score)
+        } catch (err) {
+            return cb(err)
         }
-        return cb(null, score)
+    },
+    deleteResult: async (req, cb) => {
+        try {
+            const id = req.params.id
+            const find = await Score.findByPk(id)
+            if (!samePerson(find.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You can not check another people test result.'))
+            await find.destroy()
+            let result = {
+                ...toPackage('sccuess'),
+                score: find
+            }
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
+        }
     },
     resultSinglePage: async (req, cb) => {
-        const id = req.params.id
-        const find = await Score.findByPk(id,{
-            raw: true,
-        })
-        if (!samePerson(find.userId, req.user.id)) return cb(new NoPermissionError('You can not check another people test result.'))
-        const quizId = find.allQuizId
-        const userAnswer = find.allUserAnswer
-        let quizArr = quizId.split(',')
-        quizArr.pop()
-        let userArr = userAnswer.split('')
-        let quiz = await Quiz.findAll({
-            where: {
-                id: {
-                    [Sequelize.Op.in]: quizArr
-                }
-            },
-            order: [
-                Sequelize.literal(`ARRAY_POSITION(ARRAY[${quizArr.join(',')}], id)`)
-                // Sequelize.literal(`FIELD(id, ${quizArr.join(',')})`) // 使用 FIELD 函數按照指定順序排序
-            ],
-            raw: true, 
-            nest: true
-        })
-        let back = quiz.length - 1
-        // since there might be some quiz be deleted, so need to check. If quiz is shorter than quizArr, means there
-        // are some quiz be deleted. So it will check quizArr[i] is equal to quiz's last element, if equal, means
-        // it's real, so change position to last; however, if not equal, means that quiz had been deleted, so we  
-        // will give this id's quiz a message show this quiz is deleted. Use the loop is to fill the deleted 
-        // quiz's blank
-        for (let i = quizArr.length - 1; i >= 0; i--) {
-            let t = quiz[back]
-            if (Number(quizArr[i]) === t?.id) {
-                t[`${t.answer}true`] = true
-                let user = userArr[i]
-                t[`userSelect${user}`] = true
-                ;[quiz[back],quiz[i]] = [{}, t]
-                back--
-            } else {
-                quiz[i] = {
-                    id: i - 1,
-                    'notSelect' : true
+        try {
+            const id = req.params.id
+            const find = await Score.findByPk(id,{
+                raw: true,
+            })
+            if (!samePerson(find.userId, req.user.id)) return cb(new NoPermissionError('You can not check another people test result.'))
+            const quizId = find.allQuizId
+            const userAnswer = find.allUserAnswer
+            let quizArr = quizId.split(',')
+            quizArr.pop()
+            let userArr = userAnswer.split('')
+            let quiz = await Quiz.findAll({
+                where: {
+                    id: {
+                        [Sequelize.Op.in]: quizArr
+                    }
+                },
+                order: [
+                    Sequelize.literal(`ARRAY_POSITION(ARRAY[${quizArr.join(',')}], id)`)
+                    // Sequelize.literal(`FIELD(id, ${quizArr.join(',')})`) // 使用 FIELD 函數按照指定順序排序
+                ],
+                raw: true, 
+                nest: true
+            })
+            let back = quiz.length - 1
+            // since there might be some quiz be deleted, so need to check. If quiz is shorter than quizArr, means there
+            // are some quiz be deleted. So it will check quizArr[i] is equal to quiz's last element, if equal, means
+            // it's real, so change position to last; however, if not equal, means that quiz had been deleted, so we  
+            // will give this id's quiz a message show this quiz is deleted. Use the loop is to fill the deleted 
+            // quiz's blank
+            for (let i = quizArr.length - 1; i >= 0; i--) {
+                let t = quiz[back]
+                if (Number(quizArr[i]) === t?.id) {
+                    t[`${t.answer}true`] = true
+                    let user = userArr[i]
+                    t[`userSelect${user}`] = true
+                    ;[quiz[back],quiz[i]] = [{}, t]
+                    back--
+                } else {
+                    quiz[i] = {
+                        id: i - 1,
+                        'notSelect' : true
+                    }
                 }
             }
+            let result = {
+                score: find, 
+                quiz: quiz,
+                ...toPackage('sccuess')
+            }
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
         }
-        let result = {
-            score: find, 
-            quiz: quiz,
-            ...toPackage('sccuess')
-        }
-        return cb(null, result)
     },
     userInfoPage: async (req, cb) => {
-        const data = {
-            ...toPackage('success'),
-            user: req.user
+        try {
+            const data = {
+                ...toPackage('success'),
+                user: req.user
+            }
+            return cb(null, data)
+        } catch (err) {
+            return cb(err)
         }
-        return cb(null, data)
     },
     userEditPage: async (req, cb) => {
-        let id = Number(req.params.id)
-        if (!samePerson(id, req.user.id)) return cb(new NoPermissionError('You can not check another people test result.'))
-        const data = {
-            ...toPackage('success','edit'),
-            user: req.user
+        try {
+            let id = Number(req.params.id)
+            if (!samePerson(id, req.user.id)) return cb(new NoPermissionError('You can not check another people test result.'))
+            const data = {
+                ...toPackage('success','edit'),
+                user: req.user
+            }
+            return cb(null, data)
+        } catch (err) {
+            return cb(err)
         }
-        return cb(null, data)
+        
     },
     putUserInfo: async (req, cb) => {
-        const { name, description } = req.body
-        const { file } = req
-        const id = req.user.id
-        const [check, filePath] = await Promise.all([
-            User.findByPk(id),
-            imgurFileHandler(file)
-        ])
-        await check.update({
-            name: name || check.name,
-            image: filePath || check.image,
-            description: description || check.description
-        })
-        const result = {
-            ...toPackage('success'),
+        try {
+            const { name, description } = req.body
+            const { file } = req
+            const id = req.user.id
+            const [check, filePath] = await Promise.all([
+                User.findByPk(id),
+                imgurFileHandler(file)
+            ])
+            await check.update({
+                name: name || check.name,
+                image: filePath || check.image,
+                description: description || check.description
+            })
+            const result = {
+                ...toPackage('success'),
+            }
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
         }
-        return cb(null, result)
     }
 }
 
