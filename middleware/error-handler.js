@@ -6,8 +6,10 @@ module.exports = {
       if (err.errors) err = err.errors[0].message
       if (err instanceof Error) {
             req.flash('error_msg', `${err.name}: ${err.message}`)
+            console.log(`${err}`)
       } else {
-          req.flash('error_msg', `Error : ${err}`)
+            req.flash('error_msg', `${err}`)
+            console.log(`${err}`)
       }
       res.redirect('back')
       next(err)

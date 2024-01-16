@@ -5,58 +5,80 @@ const { imgurFileHandler } = require('../helper/file-helper')
 const { samePerson } = require('../helper/same-person-helper')
 const { NoPermissionError, NotFoundError, BadRequestError } = require('../middleware/errors')
 const { OpenAI } = require('openai')
-
+const { getOffset, getPagination } = require('../helper/pagination-helper')
 
 
 const quizService = {
     home: async(req, cb) => {
-        // if have search value
-        const searchValue = req.query.search
-        let data
-        if (!searchValue) {
+        try {
+            // if have search value
+            const searchValue = req.query.search
+            const DEFAULT_LIMIT = 5 // 默認render一頁數量
+            const page = Number(req.query.page) || 1
+            const limit = Number(req.query.limit) || DEFAULT_LIMIT
+            const offset = getOffset(limit, page)
+            if (!Number.isInteger(page) || page <= 0) return cb(new BadRequestError('Invalid page number.'))
+            let data
+            // no search value means no serach, should put some content when there is no search value?
+            if (!searchValue) {
+                data = {
+                    ...toPackage('success'),
+                    empty: true
+                }
+                return cb(null, data)
+            }
+            const quiz = await Quiz.findAndCountAll({
+                where: {
+                    question: {
+                        [Sequelize.Op.like]: `%${searchValue}%`
+                    }
+                },
+                limit,
+                offset,
+                raw: true,
+                nest: true
+            })
+            if (!quiz.rows.length) {
+                if (page !== 1) return cb(new BadRequestError('Invalid page number.'))
+                return cb(new NotFoundError('There is no any result.'))
+            }
+            quiz.rows.forEach((e) => {
+                e[`${e.answer}true`] = true
+            })
             data = {
-                ...toPackage('success'),
-                empty: true
+                ...toPackage('success', 'quiz'),
+                quiz: quiz.rows,
+                count: quiz.count,
+                search: searchValue,
+                pagination: getPagination(limit, page, quiz.count)
             }
             return cb(null, data)
+        } catch (err) {
+            return cb(new Error(err))
         }
-        const quiz = await Quiz.findAll({
-            where: {
-                question: {
-                    [Sequelize.Op.like]: `%${searchValue}%`
-                }
-            },
-            raw: true,
-            nest: true
-        })
-        if (!quiz.length) return cb(new NotFoundError('There is no any result.'))
-        quiz.forEach((e) => {
-            e[`${e.answer}true`] = true
-        })
-
-        data = {
-            ...toPackage('success', 'quiz'),
-            quiz: quiz,
-        }
-        return cb(null, data)
+        
     },
     quizPage: async(req, cb) => {
-        const quiz = await Quiz.findAll({
-            where: {
-                user_id: req.user.id
-            },
-            raw:true,
-            nest:true,
-        })
-        quiz.forEach((e) => {
-            let check = `${e.answer}true`
-            e[check] = true
-        })
-        const result = {
-            ...toPackage('success'),
-            quiz: quiz
+        try {
+            const quiz = await Quiz.findAll({
+                where: {
+                    user_id: req.user.id
+                },
+                raw:true,
+                nest:true,
+            })
+            quiz.forEach((e) => {
+                let check = `${e.answer}true`
+                e[check] = true
+            })
+            const result = {
+                ...toPackage('success'),
+                quiz: quiz
+            }
+            return cb(null, result)
+        } catch (err) {
+            return cb(new Error('InterService Error'))
         }
-        return cb(null, result)
     },
     aiCreateQuiz: async (req, cb) => {
         let { ai } = req.body
