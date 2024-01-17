@@ -591,10 +591,12 @@ const quizService = {
             const find = await Score.findByPk(id)
             if (!samePerson(find.dataValues.userId, req.user.id)) return cb(new NoPermissionError('You can not check another people test result.'))
             await find.destroy()
+
             let result = {
                 ...toPackage('sccuess'),
-                score: find
+                score: find.toJSON()
             }
+
             return cb(null, result)
         } catch (err) {
             return cb(err)

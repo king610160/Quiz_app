@@ -91,7 +91,7 @@ const quizController = {
     deletePlan: (req, res, next) => {
         quizService.deletePlan(req, (err) => {
             if (err) return next(err)
-            res.redirect('/plan')
+            res.redirect('back')
         })
     },
     // will change the default folder for saving quiz
@@ -138,7 +138,7 @@ const quizController = {
     deleteResult: (req, res, next) => {
         quizService.deleteResult(req, (err) => {
             if (err) return next(err)
-            res.redirect('/result')
+            res.redirect('back')
         })
     },
     resultSinglePage: (req, res, next) => {
