@@ -30,11 +30,6 @@ const limiter = rateLimit({
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
 app.use(limiter)
-if (process.env.WEB_URL !== 'http://localhost:3000'){
-    const helmet = require('helmet')
-    app.use(helmet())
-}
-
 app.use(cors())
 app.use(xss())
 
