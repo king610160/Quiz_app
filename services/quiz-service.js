@@ -85,6 +85,7 @@ const quizService = {
                 quiz: quiz.rows,
                 pagination: getPagination(limit, page, quiz.count),
                 pgsetting: 'quiz',
+                display: quiz.count
             }
             return cb(null, result)
         } catch (err) {
@@ -104,7 +105,7 @@ const quizService = {
             const messages = [
                 {
                     role: 'user',
-                    content: `請只給我1題, "${userInput}" 的4選1的單選題並附上答案是哪個選項. 回覆內容只能有問題, 4個選項及答案, 請完全使用繁體中文回答`,
+                    content: `你是個出題老師, 請給1題關於${userInput}的4選1的單選題, 並附上答案是哪個選項, 請完全使用繁體中文回答`,
                 },
                 {
                     role: 'system',
@@ -119,43 +120,59 @@ const quizService = {
                 max_tokens: 200,
             })
 
+            // check what gpt says, so need to console.log
             let reMessage = completion.choices[0].message.content
             console.log(reMessage)
-            // check what gpt says, so need to console.log
+            
             if (reMessage.includes('抱歉') || reMessage.includes('Sorry') || reMessage.includes('違法')) return cb(new NoPermissionError('AI cannot provide that kind of message to you'))
 
             // split gpt come back's answer into arr, and filter out empty \n
             let arr = completion.choices[0].message.content.split('\n')
+            
             // check return data has some string.
             if (arr[0].includes('Thank you') || arr[0].includes('謝謝')) arr[0] = ''
-            if (arr[1].includes('：') || arr[1].includes(':')) arr[1] = ''
             arr = arr.filter(item => item.trim() !== '')
-            
             // defined the return data type
             let data = {
                 ...toPackage('success', undefined),
             }
             let quiz = {}
-            quiz.question = arr[0]
+
+            // find question, use question mark to position
+            let i = 0
+            const questionMarksRegex = /[？?]/
+            for (i; i < arr.length; i++) {
+                if (questionMarksRegex.test(arr[i])) break
+            }
+            quiz.question = arr[i]
+
+            // to find the first option            
+            const pattern = /([Aa]\.|[Aa]\))/
+            for (i; i < arr.length; i++) {
+                if (pattern.test(arr[i])) break
+            }
 
             let check = arr[arr.length - 1]
-            // check the answer first
-            for (let i = 1; i < 5; i++) {
+            // record now's i position, next 4 line will be option
+            let copyI = i
+            let copyIAdd4 = copyI + 4
+
+            // check the answer first, if include, then it should be answer
+            for (let j = 1; j < 5; i++,j++) {
                 if (check.includes(arr[i])) {
-                    quiz.answer = `select${i}`
-                    let select = `select${i}true`
+                    quiz.answer = `select${j}`
+                    let select = `select${j}true`
                     data[select] = true
                     break
                 }
             }
 
             // set the option to select 1-4
-            for (let i = 1; i < 5; i++) {
-                let temp = arr[i].split(' ')
+            for (let k = copyI, l = 1; k < copyIAdd4; k++, l++) {
+                let temp = arr[k].split(' ')
                 temp.shift()
                 temp = temp.join(' ')
-                quiz[`select${i}`] = temp
-                arr[i] = temp
+                quiz[`select${l}`] = temp
             }
 
             data.quiz = quiz
@@ -282,6 +299,7 @@ const quizService = {
                 user,
                 pagination: getPagination(limit, page, plan.count),
                 pgsetting: 'plan',
+                display: plan.count
             }
             return cb(null, result)
         } catch (err) {
@@ -559,7 +577,8 @@ const quizService = {
                 ...toPackage('success'),
                 score: result.rows,
                 pagination: getPagination(limit, page, result.count),
-                pgsetting: 'result'
+                pgsetting: 'result',
+                display: result.count
             }
             return cb(null, score)
         } catch (err) {

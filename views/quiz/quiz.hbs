@@ -71,5 +71,7 @@
       {{/each}}
   </tbody>
   </table>
-  {{>pagination}}
+  {{#if display}}
+    {{>pagination}}
+  {{/if}}
 </div>
