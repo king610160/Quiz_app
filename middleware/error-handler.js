@@ -15,7 +15,10 @@ module.exports = {
       next(err)
     },
     apiErrorHandler (err, req, res, next) {
-        if (UnauthenticatedError || NotFoundError || BadRequestError || NoPermissionError ) {
+        if (err instanceof UnauthenticatedError || 
+            err instanceof NotFoundError || 
+            err instanceof BadRequestError || 
+            err instanceof NoPermissionError) {
             res.status(err.statusCode).json({
                 status: 'error',
                 message: `${err.name} : ${err.message}`
