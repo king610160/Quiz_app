@@ -4,6 +4,7 @@ const { toPackage } = require('../helper/api-helper')
 const { imgurFileHandler } = require('../helper/file-helper')
 const { samePerson } = require('../helper/same-person-helper')
 const { NoPermissionError, NotFoundError, BadRequestError } = require('../middleware/errors')
+require('openai/shims/node')
 const { OpenAI } = require('openai')
 const { getOffset, getPagination } = require('../helper/pagination-helper')
 
@@ -34,6 +35,7 @@ const quizService = {
                     }
                 },
                 order: [['createdAt', 'DESC']],
+                include: [{model: User}],
                 limit,
                 offset,
                 raw: true,
@@ -522,7 +524,11 @@ const quizService = {
                 let realAnswer = check[i].answer
                 let rl = realAnswer.length - 1
                 let userAnswer = arr[i]
-                let ul = userAnswer?.length - 1
+                let ul
+                if (userAnswer) {
+                    ul = userAnswer.length - 1
+                }
+                
                 if (realAnswer === userAnswer) count++
                 correct += (realAnswer === userAnswer) ? '1' : '0'
                 allQuizAnswer += check[i].answer[rl]
@@ -635,7 +641,7 @@ const quizService = {
             // quiz's blank
             for (let i = quizArr.length - 1; i >= 0; i--) {
                 let t = quiz[back]
-                if (Number(quizArr[i]) === t?.id) {
+                if (t && Number(quizArr[i]) === t.id) {
                     t[`${t.answer}true`] = true
                     let user = userArr[i]
                     t[`userSelect${user}`] = true

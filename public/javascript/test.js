@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 function selectOption(optionId) {
     // Remove 'selected' class from related labels
     let arr = optionId.split('-')

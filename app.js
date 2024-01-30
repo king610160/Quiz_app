@@ -57,6 +57,10 @@ app.use('/upload', express.static(path.join(__dirname, 'upload')))
 app.use(express.json())
   
 // use redis to save session
+// app.use((req, res, next) => {
+//   console.log(req)
+//     next()
+// })
 app.use(session)
 
 // flash-message
@@ -84,3 +88,5 @@ app.listen(port, (err) => {
     console.log(`Server is running on port ${port}`)
   }
 })
+
+module.exports = app
