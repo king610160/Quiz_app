@@ -206,3 +206,30 @@ body {
     height: 50%
 }
 
+.talk-circle {
+    position: fixed;
+    bottom: 2%;
+    right: 2%;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #38ada9;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.message-icon {
+    left: 50%;
+    top: 50%;
+}
+
+.message-box {
+    position: fixed;
+    bottom: 2%;
+    right: 7%;
+    width : 250px;
+    height: 300px;
+    background-color: antiquewhite;
+    visibility: hidden;
+}
