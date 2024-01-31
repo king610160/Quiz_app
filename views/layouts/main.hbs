@@ -90,10 +90,23 @@ use warning for test? --}}
     {{> footer }}
 
     {{!-- webSocket --}}
-    <div class="message-box"></div>
+    {{#if user}}
+    <div class="message-box">
+        <div class="message-box-top-nav">
+        </div>
+        <div class="message-box-content">
+        </div>
+        <div class="message-box-end">
+            <input type="text" class="message-input">
+            <div class="transfer">
+                <i class="fa-solid fa-paper-plane"></i>
+            </div>
+        </div>
+    </div>
     <div class="talk-circle">
         <i class="fa-regular fa-message fa-xl message-icon"></i>
     </div>
+    {{/if}}
 
     {{!-- Bootstrap --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" 
@@ -102,5 +115,8 @@ use warning for test? --}}
 
     {{!-- fontawesome --}}
     <script src="https://kit.fontawesome.com/dd016403e6.js" crossorigin="anonymous"></script>
+
+    {{!-- script for message-box --}}
+    <script src="/javascript/talkCircleClick.js" defer></script>
 </body>
 </html>
