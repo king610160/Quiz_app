@@ -3,6 +3,7 @@ const { Sequelize } = require('sequelize')
 const { toPackage } = require('../helper/api-helper')
 const { imgurFileHandler } = require('../helper/file-helper')
 const { samePerson } = require('../helper/same-person-helper')
+const redisClient = require('../db/redis')
 const { NoPermissionError, NotFoundError, BadRequestError } = require('../middleware/errors')
 require('openai/shims/node')
 const { OpenAI } = require('openai')
@@ -320,7 +321,35 @@ const quizService = {
                 ...toPackage('success'),
                 plan: plan.toJSON()
             }
-            return cb(null, result)
+
+            cb(null, result)
+
+            try {
+                const reply = await new Promise((resolve, reject) => {
+                    redisClient.get(id, (err, reply) => {
+                        if (err) reject(err)
+                        else resolve(reply)
+                    })
+                })
+            
+                if (!reply) return cb(new NotFoundError('There is no this user information in the database.'), null)
+                let user = JSON.parse(reply)
+
+                const userPlan = user.plan
+                userPlan.unshift({ 'id': plan.id, 'name': plan.name })
+                user.plan = userPlan
+
+                await new Promise((resolve, reject) => {
+                    redisClient.set(user.id, JSON.stringify(user), (err) => {
+                        if (err) reject(err)
+                        else resolve()
+                    })
+                })
+            } catch (error) {
+                console.error('Redis 操作錯誤:', error)
+            }
+            
+            return 
         } catch (err) {
             return cb(err)
         }

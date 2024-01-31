@@ -4,8 +4,9 @@ const FacebookStrategy = require('passport-facebook').Strategy
 const GoogleStrategy = require('passport-google-oauth20').Strategy
 const passportJWT = require('passport-jwt')
 const bcrypt = require('bcryptjs')
+const redisClient = require('../db/redis')
 const { User, Plan } = require('../models')
-const { UnauthenticatedError } = require('../middleware/errors')
+const { UnauthenticatedError, NotFoundError } = require('../middleware/errors')
 
 const JWTStrategy = passportJWT.Strategy
 const ExtractJWT = passportJWT.ExtractJwt
@@ -23,12 +24,33 @@ passport.use(new LocalStrategy(
     async (req, email, password, cb) => {
         const user = await User.findOne({ 
             where: { email },
-            include: [{ model: Plan }],
-            attributes: { include: ['password'] } 
+            include: [{ 
+                model: Plan ,
+                attributes: ['id', 'name'],
+            }],
+            attributes: { include: ['password'] },
+            raw: true,
+            nest: true 
         })
+        // check user's info is right or not
         if (!user) return cb(new UnauthenticatedError('Email or password is not correct.'), null)          
         const compare = await bcrypt.compare(password, user.password)
         if (!compare) return cb(new UnauthenticatedError('Email or password is not correct.'), null)
+        delete user.password
+        
+        // if right, then search plan for advance user's plan
+        let plan = await Plan.findAll({
+            where: {
+                userId: user.id
+            },
+            attributes: ['id', 'name'],
+            order: [['createdAt', 'DESC']],
+            raw: true,
+            nest: true
+        })
+
+        // set plan info into user
+        user.plan = plan
         return cb(null, user)
     }
 ))
@@ -103,27 +125,19 @@ passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, cb) => {
 }))
 
 // serialize and deserialize user
-passport.serializeUser((user, cb) => {
-    return cb(null, user.id)
+passport.serializeUser(async(user, cb) => {
+    redisClient.set(user.id, JSON.stringify(user), (err) => {
+        if (err) return cb(err)
+        return cb(null, user.id)
+    })
 })
 passport.deserializeUser(async (id, cb) => {
-    let [plan, user] = await Promise.all([
-        Plan.findAll({
-            where: {
-                userId: id
-            },
-            raw: true,
-            nest: true
-        }),
-        User.findByPk(id, {
-            include: [{model: Plan}]
-        })
-    ])
-    user = {
-        ...user.toJSON(),
-        plan
-    }
-    return cb(null, user)
+    redisClient.get(id, (err, reply) => {
+        if (err) return cb(err)
+        if (!reply) return cb(new NotFoundError('There is no this user information in the database.'), null) // user not found
+        const user = JSON.parse(reply)
+        return cb(null, user)
+    })
 })
 
 module.exports = passport
