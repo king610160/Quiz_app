@@ -36,10 +36,10 @@ use warning for test? --}}
         {{!-- head picture --}}
         <div class="offcanvas-header d-flex flex-row">
             <div class="d-flex flex-row justify-content-start align-items-center">             
-                <a href="/user/info">
+                <a href="/user/info/{{user.id}}">
                     <img src="{{user.image}}" alt="headshot" class="headshot">
                 </a>
-                <a href="/user/info" class="ms-5">
+                <a href="/user/info/{{user.id}}" class="ms-5">
                     <h4>{{user.name}}</h4>
                 </a>
             </div>   
@@ -73,7 +73,14 @@ use warning for test? --}}
                     </ul>
                 </div>
             </div>
+
+            <div class="align-self-start mt-3">
+                Something
+            </div>
         </div>
+
+
+
     </div>
     {{/if}}
 

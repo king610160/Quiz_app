@@ -149,9 +149,9 @@ const quizController = {
     },
     // change user info
     userInfoPage: (req, res, next) => {
-        quizService.userInfoPage(req, (err) => {
+        quizService.userInfoPage(req, (err, data) => {
             if(err) return next(err)
-            res.render('users/info')
+            res.render('users/info', data)
         })
     },
     // edit page
@@ -165,9 +165,24 @@ const quizController = {
     putUserInfo: (req, res, next) => {
         quizService.putUserInfo(req, (err) => {
             if(err) return next(err)
-            res.redirect('/user/info')
+            res.redirect(`/user/info/${req.user.id}`)
         })
-    }
+    },
+    // be friend request
+    beFriend: (req, res, next) => {
+        quizService.beFriend(req, (err) => {
+            if (err) return next(err)
+            req.flash('success_msg','You have sent out the friend invite message')
+            res.redirect('/home')
+        })
+    },
+    // acceptFriend: (req, res, next) => {
+    //     quizService.acceptFriend((err, data) => {
+    //         if(err) return next(err)
+    //         if (data.status) req.flash('success_msg', `You accept ${data.user} to your friend`)
+    //         res.redirect('/home')
+    //     })
+    // }
 }
 
 module.exports = quizController

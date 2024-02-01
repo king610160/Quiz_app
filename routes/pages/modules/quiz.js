@@ -25,10 +25,13 @@ router.post('/plan', quizController.postPlan)
 
 // homePage
 router.get('/home', quizController.home)
-router.put('/user/info/:id', upload.single('file'),quizController.putUserInfo)
-router.get('/user/info/:id', quizController.userEditPage)
-router.get('/user/info', quizController.userInfoPage)
 router.post('/user/collect/:id', quizController.quizAddToPlan)
+
+// self panel
+router.get('/user/info/edit/:id', quizController.userEditPage)
+router.put('/user/info/:id', upload.single('file'),quizController.putUserInfo)
+router.get('/user/info/:id', quizController.userInfoPage)
+router.post('/user/beFriend/:id', quizController.beFriend)
 
 // quiz page's CURD, make quiz
 router.get('/quiz/create', quizController.createQuizPage)

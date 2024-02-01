@@ -1,4 +1,4 @@
-const { User, Quiz, Plan, Collection, Score } = require('../models')
+const { User, Quiz, Plan, Collection, Score, Friend_request } = require('../models')
 const { Sequelize } = require('sequelize')
 const { toPackage } = require('../helper/api-helper')
 const { imgurFileHandler } = require('../helper/file-helper')
@@ -666,9 +666,24 @@ const quizService = {
     },
     userInfoPage: async (req, cb) => {
         try {
+            const { id } = req.params
+            let [user, beFriendRequest] = await Promise.all([
+                User.findByPk(id),
+                Friend_request.findOne({
+                    where: { 
+                        senderId: req.user.id,
+                        receiverId: id 
+                    },
+                    raw: true,
+                    nest: true
+                })
+            ])
+            
             const data = {
                 ...toPackage('success'),
-                user: req.user
+                userInfo: user.toJSON(),
+                self: (user.id === req.user.id),
+                waiting: beFriendRequest?.status
             }
             return cb(null, data)
         } catch (err) {
@@ -710,7 +725,36 @@ const quizService = {
         } catch (err) {
             return cb(err)
         }
-    }
+    },
+    beFriend: async (req, cb) => {
+        try {
+            const create = await Friend_request.create({
+                senderId: req.user.id,
+                receiverId: Number(req.params.id),
+                status: true
+            })
+            const result = {
+                ...toPackage('success'),
+                create
+            }
+            return cb(null, result)
+        } catch (err) {
+            return cb(err)
+        }
+    },
+    // acceptFriend: async (req, cb) => {
+    //     try {
+    //         const { id, check } = req.params
+    //         const find = await Friend_request.findByPk(id)
+    //         if (check === 'reject') {
+    //             // reject
+    //         }  else {
+    //             //accpet
+    //         }
+    //     } catch (err) {
+    //         return cb(err)
+    //     }
+    // }
 }
 
 module.exports = quizService

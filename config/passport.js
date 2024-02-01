@@ -106,6 +106,7 @@ passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, cb) => {
 passport.serializeUser((user, cb) => {
     return cb(null, user.id)
 })
+
 passport.deserializeUser(async (id, cb) => {
     let [plan, user] = await Promise.all([
         Plan.findAll({

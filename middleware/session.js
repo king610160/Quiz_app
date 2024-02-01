@@ -13,7 +13,7 @@ module.exports = session({
     resave: false,
     name: 'sessionId' ,
     cookie: {
-        secure: true, // when deploy, need to change it to true, to accept https only
+        secure: false, // when deploy, need to change it to true, to accept https only
         httpOnly: true, // if true, prevent client side JS from reading the cookie
     }
 })
