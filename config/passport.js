@@ -6,7 +6,7 @@ const passportJWT = require('passport-jwt')
 const bcrypt = require('bcryptjs')
 const redisClient = require('../db/redis')
 const { User, Plan } = require('../models')
-const { UnauthenticatedError, NotFoundError } = require('../middleware/errors')
+const { UnauthenticatedError } = require('../middleware/errors')
 
 const JWTStrategy = passportJWT.Strategy
 const ExtractJWT = passportJWT.ExtractJwt
@@ -126,18 +126,24 @@ passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, cb) => {
 
 // serialize and deserialize user
 passport.serializeUser(async(user, cb) => {
-    redisClient.set(user.id, JSON.stringify(user), (err) => {
+    redisClient.set(`userId:${user.id}`, JSON.stringify(user), 'EX', 86400, (err) => {
         if (err) return cb(err)
         return cb(null, user.id)
     })
 })
 passport.deserializeUser(async (id, cb) => {
-    redisClient.get(id, (err, reply) => {
-        if (err) return cb(err)
-        if (!reply) return cb(new NotFoundError('There is no this user information in the database.'), null) // user not found
-        const user = JSON.parse(reply)
-        return cb(null, user)
-    })
+    try {
+        await redisClient.get(`userId:${id}`, (err, reply) => {
+            if (err) return cb(err)
+            if (!reply) {
+                return cb(new Error('There is no this user information in the database.'))
+            }
+            const user = JSON.parse(reply)
+            return cb(null, user)
+        })
+    } catch (err) {
+        return cb(err)
+    }
 })
 
 module.exports = passport
