@@ -56,11 +56,7 @@ app.use('/upload', express.static(path.join(__dirname, 'upload')))
 // return json
 app.use(express.json())
   
-// use redis to save session
-// app.use((req, res, next) => {
-//   console.log(req)
-//     next()
-// })
+// use session
 app.use(session)
 
 // flash-message

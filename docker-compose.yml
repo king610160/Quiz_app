@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  app:
+    image: quiz_app
+    ports:
+      - "3000:3000"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      sessionSecret: ${sessionSecret}
+      JWT_SECRET: ${JWT_SECRET}
+      IMGUR_CLIENT_ID: ${IMGUR_CLIENT_ID}
+      IMGUR_CLIENT_PASSWORD: ${IMGUR_CLIENT_PASSWORD}
+      OPEN_AI_PROJECT: ${OPEN_AI_PROJECT}
+      OPEN_AI_SECRET_KEY: ${OPEN_AI_SECRET_KEY}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      FB_PROJECT_NO: ${FB_PROJECT_NO}
+      FB_PROJECT_PASSWORD: ${FB_PROJECT_PASSWORD}
+      GOOGLE_PROJECT_NO: ${GOOGLE_PROJECT_NO}
+      GOOGLE_PROJECT_PASSWORD: ${GOOGLE_PROJECT_PASSWORD}
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:14.10
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"

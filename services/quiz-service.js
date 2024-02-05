@@ -326,7 +326,7 @@ const quizService = {
 
             try {
                 const reply = await new Promise((resolve, reject) => {
-                    redisClient.get(id, (err, reply) => {
+                    redisClient.get(`userId:${id}`, (err, reply) => {
                         if (err) reject(err)
                         else resolve(reply)
                     })
@@ -340,7 +340,7 @@ const quizService = {
                 user.plan = userPlan
 
                 await new Promise((resolve, reject) => {
-                    redisClient.set(user.id, JSON.stringify(user), (err) => {
+                    redisClient.set(`userId:${user.id}`, JSON.stringify(user), (err) => {
                         if (err) reject(err)
                         else resolve()
                     })

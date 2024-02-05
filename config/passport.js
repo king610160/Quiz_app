@@ -126,13 +126,13 @@ passport.use(new JWTStrategy(jwtOptions, async (jwtPayload, cb) => {
 
 // serialize and deserialize user
 passport.serializeUser(async(user, cb) => {
-    redisClient.set(user.id, JSON.stringify(user), (err) => {
+    redisClient.set(`userId:${user.id}`, JSON.stringify(user), (err) => {
         if (err) return cb(err)
         return cb(null, user.id)
     })
 })
 passport.deserializeUser(async (id, cb) => {
-    redisClient.get(id, (err, reply) => {
+    redisClient.get(`userId:${id}`, (err, reply) => {
         if (err) return cb(err)
         if (!reply) return cb(new NotFoundError('There is no this user information in the database.'), null) // user not found
         const user = JSON.parse(reply)

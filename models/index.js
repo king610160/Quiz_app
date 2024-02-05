@@ -6,8 +6,6 @@ const path = require('path')
 const Sequelize = require('sequelize')
 const process = require('process')
 const basename = path.basename(__filename)
-const env = process.env.NODE_ENV || 'development'
-const config = require( __dirname + '/../config/config.js' )[ env ]
 
 const db = {}
 let sequelize
@@ -16,7 +14,14 @@ let sequelize
 if (process.env.DATABASE_URL) {
     sequelize = new Sequelize(process.env.DATABASE_URL)
 } else {
-    sequelize = new Sequelize(config)
+  sequelize = new Sequelize({
+      username: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DB,
+      host: process.env.POSTGRES_HOST, // 使用 Docker Compose 中定义的服务名称
+      dialect: 'postgres',
+      port: 5432
+  })
 }
 
 fs
