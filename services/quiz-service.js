@@ -382,19 +382,37 @@ const quizService = {
         try {
             const userId = req.user.id
             const id = req.params.id
+            console.log(id)
+            // database redis update
+            const reply = await new Promise((resolve, reject) => {
+                redisClient.get(`userId:${userId}`, (err, reply) => {
+                    if (err) reject(err)
+                    else resolve(reply)
+                })
+            })
+            if (!reply) return cb(new NotFoundError('There is no this user information in the database.'), null)
+            let user = JSON.parse(reply)
+            user.Plan.id = Number(id)
+            console.log(user)
+
+            await new Promise((resolve, reject) => {
+                redisClient.set(`userId:${userId}`, JSON.stringify(reply), (err) => {
+                    if (err) reject(err)
+                    else resolve()
+                })
+            })
+
+            // database postgresql update
             const check = await User.findByPk(userId)
             if(!check) return cb(new NotFoundError('There is no this plan.'))
             await check.update({
                 planId: id
             })
-            const user = await User.findByPk(userId,{
-                include: [{
-                    model: Plan,
-                }]
-            })
+
+            // goto controller
             const result = {
                 ...toPackage('success'),
-                user: user.toJSON()
+                user
             }
             return cb(null, result)
         } catch (err) {
@@ -466,6 +484,9 @@ const quizService = {
             const quizId = req.params.id
             const planId = req.user.planId
             const userId = req.user.id
+            console.log(quizId)
+            console.log(planId)
+            console.log(userId)
             const find = await Collection.findOne({
                 where:{
                     quizId,
@@ -473,6 +494,7 @@ const quizService = {
                     userId
                 }
             })
+            console.log(find.toJSON())
             if (find) return cb(new NoPermissionError('Already collect it in the default folder.'))
             const create = await Collection.create({
                 quizId,
