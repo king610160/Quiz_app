@@ -15,7 +15,7 @@ module.exports = {
             req.flash('error_msg', `${err}`)
             console.log(`${err}`)
       }
-      res.redirect('/users/login')
+      res.redirect(req.header('Referer') || '/')
       next(err)
     },
     apiErrorHandler (err, req, res, next) {
