@@ -22,36 +22,40 @@ passport.use(new LocalStrategy(
 
     // authenticate user
     async (req, email, password, cb) => {
-        const user = await User.findOne({ 
-            where: { email },
-            include: [{ 
-                model: Plan ,
+        try {
+            const user = await User.findOne({ 
+                where: { email },
+                include: [{ 
+                    model: Plan ,
+                    attributes: ['id', 'name'],
+                }],
+                attributes: { include: ['password'] },
+                raw: true,
+                nest: true 
+            })
+            // check user's info is right or not
+            if (!user) return cb(new UnauthenticatedError('Email or password is not correct.'), null)          
+            const compare = await bcrypt.compare(password, user.password)
+            if (!compare) return cb(new UnauthenticatedError('Email or password is not correct.'), null)
+            delete user.password
+            
+            // if right, then search plan for advance user's plan
+            let plan = await Plan.findAll({
+                where: {
+                    userId: user.id
+                },
                 attributes: ['id', 'name'],
-            }],
-            attributes: { include: ['password'] },
-            raw: true,
-            nest: true 
-        })
-        // check user's info is right or not
-        if (!user) return cb(new UnauthenticatedError('Email or password is not correct.'), null)          
-        const compare = await bcrypt.compare(password, user.password)
-        if (!compare) return cb(new UnauthenticatedError('Email or password is not correct.'), null)
-        delete user.password
-        
-        // if right, then search plan for advance user's plan
-        let plan = await Plan.findAll({
-            where: {
-                userId: user.id
-            },
-            attributes: ['id', 'name'],
-            order: [['createdAt', 'DESC']],
-            raw: true,
-            nest: true
-        })
-
-        // set plan info into user
-        user.plan = plan
-        return cb(null, user)
+                order: [['createdAt', 'DESC']],
+                raw: true,
+                nest: true
+            })
+    
+            // set plan info into user
+            user.plan = plan
+            return cb(null, user)
+        } catch (error) {
+            return cb(error)
+        }
     }
 ))
 
