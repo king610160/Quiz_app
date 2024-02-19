@@ -76,6 +76,7 @@ app.use((req, res, next) => {
 
 app.use('/api/v1', apis)
 app.use(pages)
+console.log('go')
 
 app.listen(port, (err) => {
   if (err) {
