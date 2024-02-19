@@ -15,7 +15,7 @@ module.exports = {
             req.flash('error_msg', `${err}`)
             console.log(`${err}`)
       }
-      res.redirect('back')
+      res.redirect('/home')
       next(err)
     },
     apiErrorHandler (err, req, res, next) {
