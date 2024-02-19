@@ -1,9 +1,9 @@
 const { UnauthenticatedError, NotFoundError, BadRequestError, NoPermissionError } = require('./errors')
 
 module.exports = {
-    generalErrorHandler (err, req, res) {
+    generalErrorHandler (err, req, res, next) {
       // if error is from sql, then set sql's error message as error message
-      if (err.errors) err = err.errors[0].message
+      if (err.errors)  err = err.errors[0].message
       if (err instanceof Error) {
             req.flash('error_msg', `${err.name}: ${err.message}`)
             console.log(`${err}`)
@@ -11,7 +11,8 @@ module.exports = {
             req.flash('error_msg', `${err}`)
             console.log(`${err}`)
       }
-      return res.redirect('back')
+      res.redirect('back')
+      next(err)
     },
     apiErrorHandler (err, req, res, next) {
         if (err instanceof UnauthenticatedError || 
