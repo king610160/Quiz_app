@@ -97,12 +97,14 @@ const quizService = {
     },
     aiCreateQuiz: async (req, cb) => {
         try {
+            const { ai } = req.body
+            if (!ai.length) return cb(new BadRequestError('Please enter the content!'))
+            const userInput = ai.trim() 
+            if (!userInput.length) return cb(new BadRequestError('Please enter the content!'))
+
             const openai = new OpenAI({
                 apiKey: process.env.OPEN_AI_SECRET_KEY 
             })
-
-            const userInput = req.body.ai.trim()
-            if (userInput.length === 0) return cb(new BadRequestError('Please enter the content!'))
 
             const messages = [
                 {
