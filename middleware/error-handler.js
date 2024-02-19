@@ -4,7 +4,7 @@ module.exports = {
     generalErrorHandler (err, req, res, next) {
       // if error is from sql, then set sql's error message as error message
       if (err.errors && err.errors.length > 0) err = err.errors[0].message
-      
+
       if (err instanceof UnauthenticatedError || 
           err instanceof NotFoundError || 
           err instanceof BadRequestError || 
@@ -15,7 +15,7 @@ module.exports = {
             req.flash('error_msg', `${err}`)
             console.log(`${err}`)
       }
-      res.redirect('back')
+      res.redirect('/users/login')
       next(err)
     },
     apiErrorHandler (err, req, res, next) {
