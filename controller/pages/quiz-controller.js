@@ -23,8 +23,7 @@ const quizController = {
     aiCreateQuiz: (req, res, next) => {
         quizService.aiCreateQuiz(req, (err, data) => {
             if (err) {
-                next(err)
-                return
+                return next(err)
             }
             res.render('quiz/createQuiz', data)
         })
