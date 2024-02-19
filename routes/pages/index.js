@@ -7,8 +7,6 @@ const admin = require('./modules/admin')
 const auth = require('./modules/auth')
 
 const { authenticated, authenticatedAdmin } = require('../../middleware/auth')
-
-// big bracket means to load function
 const { generalErrorHandler } = require('../../middleware/error-handler')
 
 router.use('/admin', authenticatedAdmin, admin)

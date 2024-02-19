@@ -381,7 +381,6 @@ const quizService = {
         try {
             const userId = req.user.id
             const id = req.params.id
-            console.log(id)
             // database redis update
             const reply = await new Promise((resolve, reject) => {
                 redisClient.get(`userId:${userId}`, (err, reply) => {
@@ -392,7 +391,6 @@ const quizService = {
             if (!reply) return cb(new NotFoundError('There is no this user information in the database.'), null)
             let user = JSON.parse(reply)
             user.Plan.id = Number(id)
-            console.log(user)
 
             await new Promise((resolve, reject) => {
                 redisClient.set(`userId:${userId}`, JSON.stringify(reply), (err) => {
@@ -483,9 +481,6 @@ const quizService = {
             const quizId = req.params.id
             const planId = req.user.planId
             const userId = req.user.id
-            console.log(quizId)
-            console.log(planId)
-            console.log(userId)
             const find = await Collection.findOne({
                 where:{
                     quizId,
@@ -493,7 +488,6 @@ const quizService = {
                     userId
                 }
             })
-            console.log(find.toJSON())
             if (find) return cb(new NoPermissionError('Already collect it in the default folder.'))
             const create = await Collection.create({
                 quizId,

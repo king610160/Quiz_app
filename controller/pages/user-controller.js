@@ -6,7 +6,7 @@ const userController = {
         res.render('users/login')
     },
     // perform login function, will redirect to home
-    login: async (req, res) => {
+    login: (req, res) => {
         req.flash('success_msg', `Hi ${req.user.name}, let's start a quiz.`)
         res.redirect('/home')
     },

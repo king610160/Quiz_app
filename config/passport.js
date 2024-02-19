@@ -38,7 +38,6 @@ passport.use(new LocalStrategy(
             const compare = await bcrypt.compare(password, user.password)
             if (!compare) return cb(new UnauthenticatedError('Email or password is not correct.'), null)
             delete user.password
-            
             // if right, then search plan for advance user's plan
             let plan = await Plan.findAll({
                 where: {

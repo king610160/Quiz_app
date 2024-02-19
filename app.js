@@ -57,10 +57,6 @@ app.use('/upload', express.static(path.join(__dirname, 'upload')))
 app.use(express.json())
   
 // use redis to save session
-// app.use((req, res, next) => {
-//   console.log(req)
-//     next()
-// })
 app.use(session)
 
 // flash-message
@@ -77,7 +73,7 @@ app.use((req, res, next) => {
   res.locals.user = getUser(req)
   next()
 })
-  
+
 app.use('/api/v1', apis)
 app.use(pages)
 
