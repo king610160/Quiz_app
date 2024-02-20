@@ -16,6 +16,6 @@ module.exports = session({
         httpOnly: true, // if true, prevent client side JS from reading the cookie
     },
     shouldSaveSession: function(req) {
-        return req.method === 'POST'
+        return req.method !== 'HEAD'
     }
 })
