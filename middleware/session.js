@@ -11,9 +11,11 @@ module.exports = session({
     secret: process.env.sessionSecret,
     saveUninitialized: false,
     resave: false,
-    name: 'sessionId' ,
     cookie: {
         secure: true, // when deploy, need to change it to true, to accept https only
         httpOnly: true, // if true, prevent client side JS from reading the cookie
+    },
+    shouldSaveSession: function(req) {
+        return req.method === 'POST'
     }
 })

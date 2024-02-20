@@ -55,7 +55,7 @@ app.use('/upload', express.static(path.join(__dirname, 'upload')))
 
 // return json
 app.use(express.json())
-  
+
 // use redis to save session
 app.use(session)
 
