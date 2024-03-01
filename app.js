@@ -77,7 +77,7 @@ app.use((req, res, next) => {
 app.use('/api/v1', apis)
 app.use(pages)
 
-app.listen(port, '127.0.0.1', (err) => {
+app.listen(port, '0.0.0.0', (err) => {
   if (err) {
     console.error('Server start error:', err)
   } else {
