@@ -12,7 +12,7 @@ module.exports = session({
     saveUninitialized: false,
     resave: false,
     cookie: {
-        secure: false, // when deploy, need to change it to true, to accept https only
+        secure: true, // when deploy, need to change it to true, to accept https only
         httpOnly: true, // if true, prevent client side JS from reading the cookie
     },
     shouldSaveSession: function(req) {
