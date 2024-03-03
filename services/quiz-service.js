@@ -282,7 +282,7 @@ const quizService = {
             let [plan, user] = await Promise.all([
                 Plan.findAndCountAll({
                     where: {
-                        userId: id
+                        user_id: id
                     },
                     order: [['createdAt', 'DESC']],
                     limit,
@@ -380,6 +380,7 @@ const quizService = {
     changeDefaultFolder: async (req, cb) => {
         try {
             const userId = req.user.id
+            // the id need to find
             const id = req.params.id
             // database redis update
             const reply = await new Promise((resolve, reject) => {
@@ -390,10 +391,17 @@ const quizService = {
             })
             if (!reply) return cb(new NotFoundError('There is no this user information in the database.'), null)
             let user = JSON.parse(reply)
-            user.Plan.id = Number(id)
+
+            let allPlan = user.plan
+            for (let i of allPlan) {
+                if (i.id === Number(id)) {
+                    user.Plan.id = i.id
+                    user.Plan.name = i.name
+                }
+            }
 
             await new Promise((resolve, reject) => {
-                redisClient.set(`userId:${userId}`, JSON.stringify(reply), (err) => {
+                redisClient.set(`userId:${userId}`, JSON.stringify(user), 'EX', 86400, (err) => {
                     if (err) reject(err)
                     else resolve()
                 })
@@ -405,7 +413,6 @@ const quizService = {
             await check.update({
                 planId: id
             })
-
             // goto controller
             const result = {
                 ...toPackage('success'),
