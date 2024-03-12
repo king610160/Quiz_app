@@ -15,7 +15,7 @@ const userController = {
     },
     login: async(req, res, next) => {
         try {
-            const userData = req.user.toJSON()
+            const userData = req.user
             delete userData.password
             delete userData.isAdmin
             const token = jwt.sign(userData, process.env.JWT_SECRET, {expiresIn: '30d'})
